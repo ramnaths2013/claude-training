@@ -1,0 +1,21 @@
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdbx
+id_rsa*
+credentials*
+secrets*
+.claude/settings.local.json
+# Logs and data
+*.log
+*.sqlite
+# OS / editor / tooling
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+_site/
