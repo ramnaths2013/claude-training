@@ -82,3 +82,6 @@ Scale (px): 11 (labels, uppercase with 0.08em tracking), 12, 14 (body), 16 (card
 
 ## Voice
 Plain, calm, short. No exclamation marks, no buzzwords, no em-dashes in visible text. Action vocabulary stays consistent: Add task, Added; Move, Moved; Delete, Deleted. Empty column text: "Nothing here yet." Errors say what to fix: "Choose a due date that is today or later."
+
+## Addendum: IT assistant avatar
+The chatbot avatar is the one drawn mark besides the ensō. It is a round, soft face on an indigo disc, built only from the locked ink, card and indigo tokens, with a faint shu blush at 35 percent opacity. It blinks every five seconds (off under `prefers-reduced-motion`). No other icon family is introduced. The chat panel reuses the card surface, uneven card radius, the single elevation and the display, body and mono type roles.

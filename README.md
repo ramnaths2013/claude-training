@@ -12,6 +12,7 @@ A single-page Kanban board for a fictitious bank's internal IT PMO. **Demo / tra
 - Filters, inline delete confirmation (no `alert()`/`confirm()`)
 - Add-task form with inline validation and toast notifications
 - Responsive layout that stacks below 768px
+- IT assistant chatbot (bottom right): click the avatar to hear a voice greeting, then ask about board tasks or IT help; answers are retrieved in the browser from the live board and a demo FAQ
 - 8 seeded tasks using the `UOB-ITPM-####` ID format
 
 ## Run it

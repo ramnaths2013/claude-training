@@ -309,7 +309,7 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
    9. TOASTS
    ========================================================================== */
 .toast-region {
-  position: fixed; right: var(--s-4); bottom: var(--s-4); z-index: 30;
+  position: fixed; right: var(--s-4); bottom: calc(var(--s-4) + 56px + var(--s-3)); z-index: 30;
   display: flex; flex-direction: column; gap: var(--s-2); max-width: min(380px, calc(100vw - 32px));
 }
 .toast {
@@ -319,6 +319,64 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 }
 .toast.warn { background: var(--card); color: var(--kaki); border-left-color: var(--kaki-edge); }
 @keyframes toast-in { from { opacity: 0; transform: translateY(var(--s-2)); } to { opacity: 1; transform: none; } }
+
+/* ==========================================================================
+   9b. IT ASSISTANT CHATBOT (avatar button + panel), tokens only
+   ========================================================================== */
+.chat {
+  position: fixed; z-index: 15;
+  right: max(var(--s-4), env(safe-area-inset-right, 0px));
+  bottom: max(var(--s-4), env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-3);
+}
+.chat-fab {
+  width: 56px; height: 56px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--ai); box-shadow: var(--elevation); cursor: pointer;
+  transition: transform var(--dur-1) var(--ease);
+}
+.chat-fab:hover { transform: translateY(-2px); }
+.chat-fab svg { width: 56px; height: 56px; display: block; }
+.chat-fab .face { fill: var(--card); }
+.chat-fab .eye { fill: var(--sumi); transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
+.chat-fab .blush { fill: var(--shu); opacity: .35; }
+.chat-fab .line { fill: none; stroke: var(--sumi); stroke-width: 1.6; stroke-linecap: round; }
+.chat-fab .tuft { fill: none; stroke: var(--card); stroke-width: 2; stroke-linecap: round; }
+.chat-fab .tip { fill: var(--card); }
+@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@media (prefers-reduced-motion: reduce) { .chat-fab .eye { animation: none; } }
+
+.chat-panel {
+  width: 360px; max-width: calc(100vw - 2 * var(--s-4)); max-height: min(70vh, 560px);
+  display: flex; flex-direction: column;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--r-card); box-shadow: var(--elevation);
+}
+.chat-panel[hidden] { display: none; }
+.chat-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-2);
+  padding: var(--s-3) var(--s-4); border-bottom: 1px solid var(--line);
+}
+.chat-head h2 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 16px; letter-spacing: .02em; }
+.chat-head-actions { display: flex; align-items: center; gap: var(--s-2); }
+.chat-log {
+  flex: 1 1 auto; min-height: 120px; overflow-y: auto;
+  padding: var(--s-3) var(--s-4); display: flex; flex-direction: column; gap: var(--s-3);
+}
+.msg { max-width: 88%; padding: var(--s-2) var(--s-3); border-radius: var(--r-card); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.msg p { margin: 0; }
+.msg-bot { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); }
+.msg-user { align-self: flex-end; background: var(--ai); color: var(--card); }
+.msg-src { list-style: none; margin: var(--s-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-2); font-size: 12px; color: var(--muted); }
+.src-tag { display: block; font-family: var(--font-mono); letter-spacing: .04em; color: var(--ai); }
+.chat-note { margin: 0; padding: 0 var(--s-4) var(--s-2); font-size: 12px; color: var(--muted); }
+.chat-chips { display: flex; flex-wrap: wrap; gap: var(--s-2); padding: 0 var(--s-4) var(--s-3); }
+.chat-chip {
+  border: 1px solid var(--line); background: transparent; color: var(--ai);
+  border-radius: var(--r-pill); padding: var(--s-1) var(--s-3); font-size: 12px; cursor: pointer;
+}
+.chat-chip:hover { background: var(--surface); }
+.chat-form { display: flex; gap: var(--s-2); padding: var(--s-3) var(--s-4); border-top: 1px solid var(--line); }
+.chat-form input { flex: 1 1 auto; min-width: 0; }
 
 /* ==========================================================================
    10. RESPONSIVE: two rows of two below 1024px, stacked below 768px
@@ -336,7 +394,7 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
   .filters .field { flex: 1 1 100%; }
   .filters .count-note { margin-left: 0; }
   form { grid-template-columns: 1fr; padding: var(--s-4); }
-  .btn, .btn-text, select, input[type="text"], input[type="date"], .del-btn, .confirm button {
+  .btn, .btn-text, select, input[type="text"], input[type="date"], .del-btn, .confirm button, .chat-chip {
     min-height: 44px;
   }
   .del-btn { min-width: 44px; }
@@ -444,6 +502,39 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
   </section>
 </div>
 
+<!-- ============================ IT ASSISTANT CHATBOT ============================ -->
+<div class="chat" id="chat">
+  <section class="chat-panel" id="chat-panel" role="dialog" aria-label="IT assistant" hidden>
+    <header class="chat-head">
+      <h2>IT assistant</h2>
+      <div class="chat-head-actions">
+        <button type="button" class="btn-text" id="chat-mute" aria-pressed="false">Voice on</button>
+        <button type="button" class="del-btn" id="chat-close" aria-label="Close IT assistant">&times;</button>
+      </div>
+    </header>
+    <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="Conversation"></div>
+    <p class="chat-note" id="chat-note" hidden>Voice is not available in this browser.</p>
+    <div class="chat-chips" id="chat-chips"></div>
+    <form class="chat-form" id="chat-form">
+      <label class="visually-hidden" for="chat-input">Ask the IT assistant</label>
+      <input type="text" id="chat-input" maxlength="200" autocomplete="off" placeholder="Ask about tasks or IT help">
+      <button type="submit" class="btn">Send</button>
+    </form>
+  </section>
+  <button type="button" class="chat-fab" id="chat-fab" aria-label="Open IT assistant" aria-expanded="false" aria-controls="chat-panel">
+    <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <path class="tuft" d="M32 14 C29 9 30 6 34 5"/>
+      <circle class="tip" cx="34.5" cy="5" r="2.2"/>
+      <ellipse class="face" cx="32" cy="35" rx="22" ry="19"/>
+      <ellipse class="eye" cx="24" cy="34" rx="2.6" ry="3.4"/>
+      <ellipse class="eye" cx="40" cy="34" rx="2.6" ry="3.4"/>
+      <ellipse class="blush" cx="19.5" cy="41" rx="3.6" ry="2.2"/>
+      <ellipse class="blush" cx="44.5" cy="41" rx="3.6" ry="2.2"/>
+      <path class="line" d="M28 42 Q32 46.5 36 42"/>
+    </svg>
+  </button>
+</div>
+
 <!-- ============================== TOAST REGION ============================== -->
 <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="false"></div>
 
@@ -480,11 +571,12 @@ const PRIORITIES = ["Critical", "High", "Medium", "Low"];
    ========================================================================== */
 const state = {
   tasks: [],
-  filters: { project: "", assignee: "", priority: "" }
+  filters: { project: "", assignee: "", priority: "" },
+  chat: []            // chatbot messages, in memory only
 };
 // Transient UI state (which card is asking "Delete?", where to restore focus)
 // sweep: true only until the first render, so the enso draws itself once
-const ui = { confirmDeleteId: null, focus: null, lastOpener: null, sweep: true };
+const ui = { confirmDeleteId: null, focus: null, lastOpener: null, sweep: true, chatOpen: false, muted: false };
 let nextIdCounter = 1;
 
 /* ==========================================================================
@@ -903,6 +995,196 @@ function initDragAndDrop() {
 }
 
 /* ==========================================================================
+   CHATBOT — text RAG assistant. Retrieval (BM25-style) over the live board
+   tasks plus a small demo FAQ; every reply is quoted from retrieved passages.
+   No external AI, no backend, no storage: messages live in state.chat.
+   ========================================================================== */
+const GREETING_TEXT = "I am your IT assistant, how can I help you?";   // spoken on click
+const GREETING_SHOWN = "I am your IT assistant. How can I help you?";   // shown in the chat
+const CHAT_SUGGESTIONS = ["What is blocked?", "Show overdue tasks", "How do I reset my password?"];
+const FALLBACK_TEXT = "I could not find that. I can look up tasks on this board, for example \"What is blocked?\", or answer IT help questions about passwords, VPN, MFA, patching and vendor requests.";
+
+// Demo knowledge base (fictitious, for training only)
+const FAQ_DOCS = [
+  { title: "Reset your password", text: "Open the self-service portal from the intranet login page and choose Forgot password. You receive a one-time code on your enrolled device. After three failed attempts your account locks, so raise a service desk ticket and quote your staff ID." },
+  { title: "Connect to the VPN", text: "Open the corporate VPN client, sign in with your staff ID and approve the MFA prompt. If the connection drops, update the client and avoid guest networks. Persistent failures go to the network team as a medium priority ticket." },
+  { title: "Enrol in MFA", text: "Install the approved authenticator app, scan the QR code shown in the security portal and confirm with the six digit code. Lost device? Ask the service desk to reset your MFA enrolment after identity verification." },
+  { title: "Patching windows", text: "Standard patching runs on the second Saturday of each month from 10pm to 2am. Critical security patches follow the emergency change process and may run out of hours once change approval is recorded." },
+  { title: "Request a vendor or software purchase", text: "Log the request under the Vendor Management workstream with a business case, a named contract owner and a security review. Procurement starts only after the security review is approved." },
+  { title: "Request a new laptop or system access", text: "Raise a service desk ticket with your manager's approval. Standard laptops are delivered within five working days. Access to production systems also needs the system owner's sign-off." },
+  { title: "Incident priority levels", text: "Critical means a service is down and customers are affected, with a response in 15 minutes. High means a major function is degraded, response within 1 hour. Medium is a workaround exists, response within 1 business day. Low is a minor issue, response within 3 business days." },
+  { title: "How to use this board", text: "Drag a card to another column or use the Move control on the card. Filter by project, assignee or priority above the board. Use Add task to create a task. Board data is demo data and resets when you refresh the page." }
+];
+
+const STOP_WORDS = new Set(("a an the is are was were be been am do does did how what which who whom when where why i me my we our you your it its " +
+  "of to in on at for from with about and or but if then so can could should would will shall please show tell give me list any there this that these those has have had").split(" "));
+const SYNONYMS = { stuck: "blocked", waiting: "blocked", late: "overdue", pastdue: "overdue",
+  finished: "done", complete: "done", completed: "done", owner: "assignee", lead: "assignee" };
+
+// Lowercase, drop punctuation and stop words, map synonyms, light stemming.
+function stem(w) {
+  if (w.length > 5 && w.endsWith("ing")) return w.slice(0, -3);
+  if (w.length > 4 && w.endsWith("ed")) return w.slice(0, -2);
+  if (w.length > 3 && w.endsWith("s") && !w.endsWith("ss")) return w.slice(0, -1);
+  return w;
+}
+function tokenize(text) {
+  return String(text).toLowerCase().replace(/[^a-z0-9]+/g, " ").split(" ")
+    .filter(w => w && !STOP_WORDS.has(w))
+    .map(w => stem(SYNONYMS[w] || w));
+}
+
+// One document per live task plus one per FAQ entry. Rebuilt on every question,
+// so answers follow board changes.
+function buildCorpus() {
+  const docs = state.tasks.map(t => {
+    const overdue = isOverdue(t);
+    const due = formatDate(t.dueDate);
+    return {
+      label: t.id,
+      line: `${t.title} (${t.status}, ${t.priority} priority, ${t.assignee}, due ${due}${overdue ? ", overdue" : ""})`,
+      tokens: tokenize(`task ${t.id} ${t.title} ${t.description} ${t.project} ${t.category} ${t.assignee} ` +
+                       `${t.priority} ${t.status} due ${due} ${overdue ? "overdue" : ""}`)
+    };
+  });
+  FAQ_DOCS.forEach(f => docs.push({ label: "FAQ: " + f.title, line: f.text, tokens: tokenize(f.title + " " + f.text) }));
+  return docs;
+}
+
+// BM25-style ranking. Keeps hits scoring at least half of the best one.
+function retrieve(query, k = 4) {
+  const q = tokenize(query);
+  if (!q.length) return [];
+  const docs = buildCorpus();
+  const N = docs.length;
+  const avgLen = docs.reduce((a, d) => a + d.tokens.length, 0) / N;
+  const df = {};
+  docs.forEach(d => new Set(d.tokens).forEach(t => { df[t] = (df[t] || 0) + 1; }));
+  const k1 = 1.4, b = 0.75;
+  const scored = docs.map(d => {
+    const tf = {};
+    d.tokens.forEach(t => { tf[t] = (tf[t] || 0) + 1; });
+    let score = 0;
+    q.forEach(t => {
+      if (!tf[t]) return;
+      const idf = Math.log(1 + (N - df[t] + 0.5) / (df[t] + 0.5));
+      score += idf * (tf[t] * (k1 + 1)) / (tf[t] + k1 * (1 - b + b * d.tokens.length / avgLen));
+    });
+    return { doc: d, score };
+  }).filter(x => x.score > 0).sort((a, b2) => b2.score - a.score);
+  if (!scored.length) return [];
+  const top = scored[0].score;
+  return scored.filter(x => x.score >= top * 0.5).slice(0, k);
+}
+
+// Compose a reply from retrieved passages only.
+function answer(query) {
+  const hits = retrieve(query);
+  if (!hits.length) return { text: FALLBACK_TEXT, sources: [] };
+  return {
+    text: hits.length === 1 ? "Here is what I found." : `I found ${hits.length} matches.`,
+    sources: hits.map(h => ({ label: h.doc.label, line: h.doc.line }))
+  };
+}
+
+function askAssistant(text) {
+  const q = text.trim();
+  if (!q) return;
+  state.chat.push({ role: "user", text: q, sources: [] });
+  const a = answer(q);
+  state.chat.push({ role: "bot", text: a.text, sources: a.sources });
+  renderChat();
+}
+
+// Speak the greeting. Must run inside the click handler (browser autoplay rules).
+function voiceSupported() {
+  return "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+}
+function speakGreeting() {
+  if (ui.muted || !voiceSupported()) return false;
+  try {
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(GREETING_TEXT);
+    u.lang = "en-US";
+    u.pitch = 1.15;
+    const voice = synth.getVoices().find(v => /^en/i.test(v.lang));
+    if (voice) u.voice = voice;
+    synth.speak(u);
+    return true;
+  } catch (err) {
+    console.warn("Voice failed:", err);
+    return false;
+  }
+}
+function stopSpeaking() {
+  try { if (voiceSupported()) window.speechSynthesis.cancel(); } catch (err) { /* ignore */ }
+}
+
+function toggleChat(open) {
+  ui.chatOpen = open;
+  if (open) {
+    if (!state.chat.length) state.chat.push({ role: "bot", text: GREETING_SHOWN, sources: [] });
+    speakGreeting();
+  } else {
+    stopSpeaking();
+  }
+  renderChat();
+  (open ? document.getElementById("chat-input") : document.getElementById("chat-fab")).focus();
+}
+
+function renderChatMessage(m) {
+  const src = (m.sources && m.sources.length)
+    ? `<ul class="msg-src">${m.sources.map(s =>
+        `<li><span class="src-tag">${escapeHtml(s.label)}</span>${escapeHtml(s.line)}</li>`).join("")}</ul>`
+    : "";
+  return `<div class="msg msg-${m.role === "user" ? "user" : "bot"}"><p>${escapeHtml(m.text)}</p>${src}</div>`;
+}
+
+// The only place that writes chat HTML.
+function renderChat() {
+  const open = ui.chatOpen;
+  document.getElementById("chat-panel").hidden = !open;
+  const fab = document.getElementById("chat-fab");
+  fab.setAttribute("aria-expanded", String(open));
+  fab.setAttribute("aria-label", open ? "Close IT assistant" : "Open IT assistant");
+  const mute = document.getElementById("chat-mute");
+  mute.textContent = ui.muted ? "Voice off" : "Voice on";
+  mute.setAttribute("aria-pressed", String(ui.muted));
+  document.getElementById("chat-note").hidden = voiceSupported();
+  const log = document.getElementById("chat-log");
+  log.innerHTML = state.chat.map(renderChatMessage).join("");
+  log.scrollTop = log.scrollHeight;
+  document.getElementById("chat-chips").innerHTML = CHAT_SUGGESTIONS.map(s =>
+    `<button type="button" class="chat-chip" data-q="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join("");
+}
+
+function initChat() {
+  document.getElementById("chat-fab").addEventListener("click", () => toggleChat(!ui.chatOpen));
+  document.getElementById("chat-close").addEventListener("click", () => toggleChat(false));
+  document.getElementById("chat-mute").addEventListener("click", () => {
+    ui.muted = !ui.muted;
+    if (ui.muted) stopSpeaking();
+    renderChat();
+  });
+  document.getElementById("chat-chips").addEventListener("click", e => {
+    const chip = e.target.closest(".chat-chip");
+    if (chip) askAssistant(chip.dataset.q);
+  });
+  document.getElementById("chat-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const input = document.getElementById("chat-input");
+    askAssistant(input.value);
+    input.value = "";
+    input.focus();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && ui.chatOpen && document.getElementById("modal").hidden) toggleChat(false);
+  });
+  renderChat();
+}
+
+/* ==========================================================================
    INIT — populate selects, wire events, first render
    ========================================================================== */
 function fillSelect(select, values, selected) {
@@ -966,6 +1248,7 @@ function init() {
   form.addEventListener("input", updateCounters);
 
   renderBoard();
+  initChat();
 }
 
 init();

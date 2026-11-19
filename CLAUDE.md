@@ -12,6 +12,11 @@ Single-page IT PMO Kanban board for a fictitious bank's internal IT PMO. Demo/tr
 - No persistence: no `localStorage`, `sessionStorage`, IndexedDB or cookies. Board state lives in `state.tasks` and resets to the seed data on refresh. The UI says so.
 - Only network call: FormSubmit AJAX endpoint (`FORMSUBMIT_ENDPOINT`, config constant at the top of the script). A failed call must never break the board. Never send the user's email address anywhere else.
 
+## IT assistant chatbot
+- Bottom-right avatar opens a text chat. Clicking it speaks "I am your IT assistant, how can I help you?" with the browser's Web Speech API (`speechSynthesis`, no external service).
+- RAG is in-browser only: BM25-style retrieval over live `state.tasks` plus a demo FAQ, replies quoted from retrieved passages. No LLM, no backend, chat lives in `state.chat` (memory only).
+- Hook: `.claude/hooks/check-index.sh` (registered in `.claude/settings.json`, PostToolUse on Write/Edit/MultiEdit) checks `index.html` after every edit: greeting present, `speechSynthesis` used, no storage APIs or `!important`, no external resources, `fetch` only for FormSubmit. Exit code 2 means fix the listed problems.
+
 ## Code conventions
 - `state = { tasks: [], filters: {} }` is the single source of truth. Re-render from state; only `renderBoard()` and the functions it calls write card/column/summary HTML.
 - Keep small named functions: `renderBoard`, `renderCard`, `addTask`, `moveTask`, `deleteTask`, `applyFilters`, `showToast`, `notifyNewTask`.
