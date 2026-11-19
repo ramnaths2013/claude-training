@@ -1,0 +1,6 @@
+{
+  "name": "frontend-design-ui-ux",
+  "version": "1.0.0",
+  "description": "Produces a locked design language and an implementation-ready UX/UI spec (flows, states, components, accessibility). Packaged from the ulpi-io/skills frontend-design-ui-ux skill.",
+  "keywords": ["design", "ui", "ux", "design-system"]
+}
