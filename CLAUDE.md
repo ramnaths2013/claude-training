@@ -17,6 +17,10 @@ Single-page IT PMO Kanban board for a fictitious bank's internal IT PMO. Demo/tr
 - RAG is in-browser only: BM25-style retrieval over live `state.tasks` plus a demo FAQ, replies quoted from retrieved passages. No LLM, no backend, chat lives in `state.chat` (memory only).
 - Hook: `.claude/hooks/check-index.sh` (registered in `.claude/settings.json`, PostToolUse on Write/Edit/MultiEdit) checks `index.html` after every edit: greeting present, `speechSynthesis` used, no storage APIs or `!important`, no external resources, `fetch` only for FormSubmit. Exit code 2 means fix the listed problems.
 
+## IT meeting popup
+- After the visitor has been on the page for 10 seconds (`NOTICE_DELAY_MS = 10000`), an in-page `role="alertdialog"` shows once per page load: IT meeting next Wednesday, 10:00 am, Room 888 (the date is computed from today). Never a native `alert()`. It waits if the add-task dialog is open. No storage, so a refresh shows it again.
+- Hook: `.claude/hooks/check-meeting-notice.sh` (registered in `.claude/settings.json` next to the other guard) checks the 10 second delay, Wednesday, 10:00 am, Room 888, the alertdialog role and that no native `alert(` call exists.
+
 ## Code conventions
 - `state = { tasks: [], filters: {} }` is the single source of truth. Re-render from state; only `renderBoard()` and the functions it calls write card/column/summary HTML.
 - Keep small named functions: `renderBoard`, `renderCard`, `addTask`, `moveTask`, `deleteTask`, `applyFilters`, `showToast`, `notifyNewTask`.

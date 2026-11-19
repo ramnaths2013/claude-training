@@ -13,6 +13,7 @@ A single-page Kanban board for a fictitious bank's internal IT PMO. **Demo / tra
 - Add-task form with inline validation and toast notifications
 - Responsive layout that stacks below 768px
 - IT assistant chatbot (bottom right): click the avatar to hear a voice greeting, then ask about board tasks or IT help; answers are retrieved in the browser from the live board and a demo FAQ
+- After 10 seconds on the page, a reminder dialog announces the IT meeting (next Wednesday, 10:00 am, Room 888)
 - 8 seeded tasks using the `UOB-ITPM-####` ID format
 
 ## Run it

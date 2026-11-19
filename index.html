@@ -379,6 +379,15 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 .chat-form input { flex: 1 1 auto; min-width: 0; }
 
 /* ==========================================================================
+   9c. MEETING NOTICE (in-page alert dialog shown after 10 seconds)
+   ========================================================================== */
+.modal.notice { max-width: 420px; }
+.notice-body { padding: var(--s-5); display: grid; gap: var(--s-4); }
+.notice-body p { margin: 0; font-size: 14px; }
+.notice-body .meta { font-size: 14px; gap: var(--s-2) var(--s-4); }
+.notice-actions { display: flex; justify-content: flex-end; }
+
+/* ==========================================================================
    10. RESPONSIVE: two rows of two below 1024px, stacked below 768px
    ========================================================================== */
 @media (max-width: 1023px) {
@@ -502,6 +511,24 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
   </section>
 </div>
 
+<!-- ============================ MEETING NOTICE ============================ -->
+<div class="backdrop" id="notice" hidden>
+  <section class="modal notice" role="alertdialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-text">
+    <div class="modal-head">
+      <h2 id="notice-title">IT meeting reminder</h2>
+      <button type="button" class="del-btn" id="notice-x" aria-label="Close reminder">&times;</button>
+    </div>
+    <div class="notice-body">
+      <p id="notice-text">There is an IT meeting next Wednesday. Please attend.</p>
+      <dl class="meta">
+        <dt>When</dt><dd id="notice-when"></dd>
+        <dt>Where</dt><dd id="notice-where"></dd>
+      </dl>
+      <div class="notice-actions"><button type="button" class="btn" id="notice-ok">Got it</button></div>
+    </div>
+  </section>
+</div>
+
 <!-- ============================ IT ASSISTANT CHATBOT ============================ -->
 <div class="chat" id="chat">
   <section class="chat-panel" id="chat-panel" role="dialog" aria-label="IT assistant" hidden>
@@ -576,7 +603,7 @@ const state = {
 };
 // Transient UI state (which card is asking "Delete?", where to restore focus)
 // sweep: true only until the first render, so the enso draws itself once
-const ui = { confirmDeleteId: null, focus: null, lastOpener: null, sweep: true, chatOpen: false, muted: false };
+const ui = { confirmDeleteId: null, focus: null, lastOpener: null, sweep: true, chatOpen: false, muted: false, noticeOpen: false };
 let nextIdCounter = 1;
 
 /* ==========================================================================
@@ -1179,9 +1206,72 @@ function initChat() {
     input.focus();
   });
   document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && ui.chatOpen && document.getElementById("modal").hidden) toggleChat(false);
+    if (e.key === "Escape" && ui.chatOpen && !ui.noticeOpen && document.getElementById("modal").hidden) toggleChat(false);
   });
   renderChat();
+}
+
+/* ==========================================================================
+   MEETING NOTICE — after the visitor has been on the page for 10 seconds, show
+   an in-page alert dialog once per page load (no native alert(), no storage).
+   ========================================================================== */
+const NOTICE_DELAY_MS = 10000;
+const MEETING = { title: "IT meeting", weekday: 3, time: "10:00 am", room: "Room 888" }; // 3 = Wednesday
+
+// The next occurrence of a weekday (a full week ahead if today is that day).
+function nextWeekday(weekday) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  let add = (weekday - d.getDay() + 7) % 7;
+  if (add === 0) add = 7;
+  d.setDate(d.getDate() + add);
+  return d;
+}
+
+function renderNotice() {
+  const when = nextWeekday(MEETING.weekday)
+    .toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", year: "numeric" });
+  document.getElementById("notice-when").textContent = `${when}, ${MEETING.time}`;
+  document.getElementById("notice-where").textContent = MEETING.room;
+  document.getElementById("notice").hidden = !ui.noticeOpen;
+}
+
+function openNotice() {
+  ui.lastNoticeOpener = document.activeElement;
+  ui.noticeOpen = true;
+  renderNotice();
+  document.getElementById("notice-ok").focus();
+}
+function closeNotice() {
+  ui.noticeOpen = false;
+  renderNotice();
+  if (ui.lastNoticeOpener && ui.lastNoticeOpener.focus) ui.lastNoticeOpener.focus();
+}
+
+// Wait until the add-task dialog is closed so the two never stack.
+function tryShowNotice() {
+  if (!document.getElementById("modal").hidden) { setTimeout(tryShowNotice, 1000); return; }
+  openNotice();
+}
+
+function initNotice() {
+  document.getElementById("notice-ok").addEventListener("click", closeNotice);
+  document.getElementById("notice-x").addEventListener("click", closeNotice);
+  document.getElementById("notice").addEventListener("mousedown", e => {
+    if (e.target.id === "notice") closeNotice();
+  });
+  document.addEventListener("keydown", e => {
+    if (!ui.noticeOpen) return;
+    if (e.key === "Escape") closeNotice();
+    if (e.key === "Tab") {   // keep focus inside the dialog
+      const items = [...document.getElementById("notice").querySelectorAll("button")];
+      const first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+  renderNotice();
+  setTimeout(tryShowNotice, NOTICE_DELAY_MS);
 }
 
 /* ==========================================================================
@@ -1249,6 +1339,7 @@ function init() {
 
   renderBoard();
   initChat();
+  initNotice();
 }
 
 init();
