@@ -1,12 +1,12 @@
 {
   "version": 2,
   "skills": {
-    "frontend-design-ui-ux": {
-      "source": "ulpi-io/skills",
-      "commit": "b3e5e33424cfcccdbc0468fb66f06bb56f4e2a1f",
+    "frontend-ui-design": {
+      "source": "pixel-process-ug/superkit-agents",
+      "commit": "cc7fcb7e47bc4c50020abdf352fa5d8914d0a7c2",
       "sourceType": "github",
-      "skillPath": "frontend-design-ui-ux/SKILL.md",
-      "computedHash": "3339aff4401378b46b78154ea71eeb43426dfdac1e9e10cfd6714bd3916ad3bf"
+      "skillPath": "templates/skills/frontend-ui-design/SKILL.md",
+      "computedHash": "77abecb55778e96969c0f876fa50a4ff4b418e6f813dfde6b5f010e5d407217c"
     }
   }
 }
