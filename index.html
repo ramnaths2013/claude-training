@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IT PMO – Project Board</title>
+<style>
+/* ==========================================================================
+   1. DESIGN TOKENS — palette + spacing scale (all colours live here)
+   ========================================================================== */
+:root {
+  --blue-900: #0b2545;
+  --blue-800: #123a6b;
+  --blue-700: #1a4f94;
+  --blue-600: #1f63b8;
+  --blue-200: #c9dcf3;
+  --blue-100: #e3edf9;
+  --blue-50:  #f2f6fc;
+  --ink:      #14213a;
+  --ink-soft: #4a5a75;
+  --line:     #d3dcea;
+  --surface:  #ffffff;
+  --bg:       #eaf0f8;
+
+  --crit: #c62828;
+  --high: #e08a00;
+  --med:  #1f63b8;
+  --low:  #8791a1;
+  --ok:   #1b7a3d;
+  --warn-bg: #fff4d6;
+  --warn-ink: #6b4a00;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+
+  --radius: 8px;
+  --shadow: 0 1px 2px rgba(11, 37, 69, .12), 0 2px 6px rgba(11, 37, 69, .08);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ==========================================================================
+   2. BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--bg);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--blue-600); outline-offset: 2px; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ==========================================================================
+   3. HEADER + SUMMARY STRIP
+   ========================================================================== */
+.app-header {
+  background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
+  color: #fff;
+  padding: var(--s-4) var(--s-5);
+}
+.header-top {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4);
+  justify-content: space-between;
+}
+.wordmark { display: flex; align-items: baseline; gap: var(--s-3); }
+.wordmark strong {
+  font-size: 22px; letter-spacing: .08em;
+  border: 2px solid #fff; padding: 0 var(--s-2); border-radius: 4px;
+}
+.wordmark span { font-size: 15px; opacity: .9; }
+.header-actions { display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; }
+.demo-note { font-size: 12px; opacity: .85; margin: 0; }
+.summary {
+  list-style: none; margin: var(--s-4) 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: var(--s-2);
+}
+.summary li {
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: var(--radius);
+  padding: var(--s-1) var(--s-3);
+  display: flex; gap: var(--s-2); align-items: baseline;
+}
+.summary .num { font-size: 18px; font-weight: 700; }
+.summary .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; opacity: .9; }
+.summary li.is-overdue { background: rgba(198, 40, 40, .35); border-color: rgba(255, 190, 190, .7); }
+
+/* ==========================================================================
+   4. BUTTONS
+   ========================================================================== */
+.btn {
+  border: 1px solid var(--blue-600); background: var(--blue-600); color: #fff;
+  padding: var(--s-2) var(--s-4); border-radius: var(--radius); font-weight: 600;
+}
+.btn:hover { background: var(--blue-700); }
+.btn:disabled { opacity: .65; cursor: progress; }
+.btn-light { background: #fff; color: var(--blue-800); border-color: #fff; }
+.btn-light:hover { background: var(--blue-100); }
+.btn-ghost { background: transparent; color: var(--blue-700); border-color: var(--line); }
+.btn-ghost:hover { background: var(--blue-50); }
+
+/* ==========================================================================
+   5. FILTER BAR
+   ========================================================================== */
+.filters {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s-4);
+  padding: var(--s-3) var(--s-5);
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.filters .field { display: flex; flex-direction: column; gap: var(--s-1); min-width: 170px; }
+.filters label { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+.filters .count-note { margin-left: auto; font-size: 12px; color: var(--ink-soft); }
+
+/* ==========================================================================
+   6. BOARD + COLUMNS
+   ========================================================================== */
+.board {
+  display: flex; gap: var(--s-4); align-items: stretch;
+  padding: var(--s-5);
+}
+.column {
+  flex: 1 1 0; min-width: 0;
+  background: var(--blue-100);
+  border: 2px solid transparent;
+  border-top: 4px solid var(--blue-700);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column;
+  min-height: 220px;
+}
+.column[data-status="In Progress"] { border-top-color: var(--blue-600); }
+.column[data-status="Blocked"]     { border-top-color: var(--crit); }
+.column[data-status="Done"]        { border-top-color: var(--ok); }
+.column.drag-over {
+  border-color: var(--blue-600);
+  background: var(--blue-200);
+  box-shadow: inset 0 0 0 2px var(--blue-600);
+}
+.column-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--s-3) var(--s-3) var(--s-2);
+}
+.column-head h2 { margin: 0; font-size: 15px; color: var(--blue-900); }
+.column-head .sub { font-size: 11px; color: var(--ink-soft); display: block; font-weight: 400; }
+.badge {
+  min-width: 26px; text-align: center; padding: 1px var(--s-2);
+  border-radius: 999px; background: var(--blue-800); color: #fff;
+  font-size: 12px; font-weight: 700;
+}
+.dropzone {
+  list-style: none; margin: 0; padding: var(--s-2) var(--s-3) var(--s-3);
+  display: flex; flex-direction: column; gap: var(--s-3); flex: 1;
+}
+.empty { color: var(--ink-soft); font-size: 12px; text-align: center; padding: var(--s-4); border: 1px dashed var(--blue-200); border-radius: var(--radius); }
+
+/* ==========================================================================
+   7. CARDS
+   ========================================================================== */
+.card {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border-left: 5px solid var(--low);
+  box-shadow: var(--shadow);
+  padding: var(--s-3);
+  display: flex; flex-direction: column; gap: var(--s-2);
+  cursor: grab;
+}
+.card.p-critical { border-left-color: var(--crit); }
+.card.p-high     { border-left-color: var(--high); }
+.card.p-medium   { border-left-color: var(--med); }
+.card.p-low      { border-left-color: var(--low); }
+.card.dragging   { opacity: .45; }
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
+.card-id { font-size: 11px; font-weight: 700; color: var(--blue-700); letter-spacing: .03em; }
+.card h3 { margin: 0; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
+.card .desc {
+  margin: 0; font-size: 12px; color: var(--ink-soft); overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px var(--s-2); font-size: 12px; }
+.meta dt { color: var(--ink-soft); }
+.meta dd { margin: 0; overflow-wrap: anywhere; }
+.chips { display: flex; flex-wrap: wrap; gap: var(--s-1); align-items: center; }
+.pill, .tag, .overdue {
+  font-size: 11px; font-weight: 700; padding: 1px var(--s-2); border-radius: 999px; white-space: nowrap;
+}
+.pill { color: #fff; }
+.pill.critical { background: var(--crit); }
+.pill.high     { background: #a85f00; }
+.pill.medium   { background: var(--med); }
+.pill.low      { background: #5d6675; }
+.tag { background: var(--blue-100); color: var(--blue-800); border: 1px solid var(--blue-200); font-weight: 600; }
+.overdue { background: #fde8e8; color: var(--crit); border: 1px solid #f3b4b4; }
+.card-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); margin-top: var(--s-1); }
+.move-select { padding: 2px var(--s-2); border: 1px solid var(--line); border-radius: 6px; background: var(--blue-50); font-size: 12px; max-width: 120px; }
+.del-btn {
+  border: 1px solid transparent; background: transparent; color: var(--ink-soft);
+  width: 26px; height: 26px; border-radius: 50%; font-size: 18px; line-height: 1; padding: 0;
+}
+.del-btn:hover { background: #fde8e8; color: var(--crit); }
+.confirm { display: flex; align-items: center; gap: var(--s-1); font-size: 12px; font-weight: 600; }
+.confirm button { border: 1px solid var(--line); border-radius: 6px; padding: 1px var(--s-2); background: #fff; font-size: 12px; }
+.confirm .yes { background: var(--crit); border-color: var(--crit); color: #fff; }
+
+/* ==========================================================================
+   8. MODAL + FORM
+   ========================================================================== */
+.backdrop {
+  position: fixed; inset: 0; background: rgba(11, 37, 69, .55);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: var(--s-5) var(--s-4); overflow-y: auto; z-index: 20;
+}
+.backdrop[hidden] { display: none; }
+.modal {
+  background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 560px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .35);
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--s-4) var(--s-5); border-bottom: 1px solid var(--line);
+}
+.modal-head h2 { margin: 0; font-size: 18px; color: var(--blue-900); }
+form { padding: var(--s-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+.field { display: flex; flex-direction: column; gap: var(--s-1); }
+.field.full { grid-column: 1 / -1; }
+form label { font-weight: 600; font-size: 13px; }
+.req { color: var(--crit); }
+input[type="text"], input[type="date"], select, textarea {
+  border: 1px solid #aebbd0; border-radius: 6px; padding: var(--s-2) var(--s-3); background: #fff; width: 100%;
+}
+textarea { resize: vertical; min-height: 80px; }
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--crit); background: #fff7f7; }
+.error { color: var(--crit); font-size: 12px; margin: 0; min-height: 0; }
+.counter { font-size: 11px; color: var(--ink-soft); text-align: right; }
+.form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: var(--s-3); }
+
+/* ==========================================================================
+   9. TOASTS
+   ========================================================================== */
+.toast-region {
+  position: fixed; right: var(--s-4); bottom: var(--s-4); z-index: 30;
+  display: flex; flex-direction: column; gap: var(--s-2); max-width: min(380px, calc(100vw - 32px));
+}
+.toast {
+  padding: var(--s-3) var(--s-4); border-radius: var(--radius); box-shadow: var(--shadow);
+  background: var(--blue-900); color: #fff; border-left: 5px solid var(--ok);
+}
+.toast.warn { background: var(--warn-bg); color: var(--warn-ink); border-left-color: var(--high); }
+
+/* ==========================================================================
+   10. RESPONSIVE — stack columns below 768px
+   ========================================================================== */
+@media (max-width: 767px) {
+  .board { flex-direction: column; padding: var(--s-4); }
+  .column { min-height: 0; }
+  .app-header, .filters { padding-left: var(--s-4); padding-right: var(--s-4); }
+  form { grid-template-columns: 1fr; padding: var(--s-4); }
+  .filters .field { flex: 1 1 100%; }
+  .filters .count-note { margin-left: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card, .column { transition: background .15s, box-shadow .15s, opacity .15s; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= HEADER + SUMMARY STRIP ======================= -->
+<header class="app-header">
+  <div class="header-top">
+    <div class="wordmark" aria-label="IT PMO">
+      <strong>IT PMO</strong>
+      <span>Project Board · internal demo</span>
+    </div>
+    <div class="header-actions">
+      <p class="demo-note">Demo data only — the board resets to its seed tasks when you refresh the page.</p>
+      <button type="button" class="btn btn-light" id="open-add">+ Add Task</button>
+    </div>
+  </div>
+  <ul class="summary" id="summary" aria-label="Board summary"></ul>
+</header>
+
+<!-- ============================ FILTER BAR ============================== -->
+<section class="filters" aria-label="Filter tasks">
+  <div class="field">
+    <label for="f-project">Project</label>
+    <select id="f-project"><option value="">All projects</option></select>
+  </div>
+  <div class="field">
+    <label for="f-assignee">Assignee contains</label>
+    <input type="text" id="f-assignee" placeholder="e.g. Tan" autocomplete="off">
+  </div>
+  <div class="field">
+    <label for="f-priority">Priority</label>
+    <select id="f-priority"><option value="">All priorities</option></select>
+  </div>
+  <button type="button" class="btn btn-ghost" id="f-clear">Clear filters</button>
+  <span class="count-note" id="filter-note" aria-live="polite"></span>
+</section>
+
+<!-- ============================== BOARD ================================= -->
+<main class="board" id="board"></main>
+
+<!-- ============================ ADD TASK MODAL ========================== -->
+<div class="backdrop" id="modal" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h2 id="modal-title">Add Task</h2>
+      <button type="button" class="del-btn" id="close-add" aria-label="Close add task dialog">&times;</button>
+    </div>
+    <form id="task-form" novalidate>
+      <div class="field full">
+        <label for="t-title">Task Title <span class="req" aria-hidden="true">*</span></label>
+        <input type="text" id="t-title" name="title" maxlength="80" aria-describedby="t-title-err" autocomplete="off">
+        <span class="counter" id="t-title-count">0 / 80</span>
+        <p class="error" id="t-title-err"></p>
+      </div>
+      <div class="field full">
+        <label for="t-desc">Description</label>
+        <textarea id="t-desc" name="description" maxlength="500" aria-describedby="t-desc-err"></textarea>
+        <span class="counter" id="t-desc-count">0 / 500</span>
+        <p class="error" id="t-desc-err"></p>
+      </div>
+      <div class="field">
+        <label for="t-project">Project / Workstream</label>
+        <select id="t-project" name="project"></select>
+      </div>
+      <div class="field">
+        <label for="t-category">Category</label>
+        <select id="t-category" name="category"></select>
+      </div>
+      <div class="field">
+        <label for="t-assignee">Assignee <span class="req" aria-hidden="true">*</span></label>
+        <input type="text" id="t-assignee" name="assignee" aria-describedby="t-assignee-err" autocomplete="off">
+        <p class="error" id="t-assignee-err"></p>
+      </div>
+      <div class="field">
+        <label for="t-priority">Priority</label>
+        <select id="t-priority" name="priority"></select>
+      </div>
+      <div class="field">
+        <label for="t-due">Due Date <span class="req" aria-hidden="true">*</span></label>
+        <input type="date" id="t-due" name="dueDate" aria-describedby="t-due-err">
+        <p class="error" id="t-due-err"></p>
+      </div>
+      <div class="field">
+        <label for="t-status">Status</label>
+        <select id="t-status" name="status"></select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-add">Cancel</button>
+        <button type="submit" class="btn" id="submit-btn">Add Task</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<!-- ============================ TOAST REGION ============================ -->
+<div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="false"></div>
+
+<script>
+"use strict";
+
+/* ==========================================================================
+   CONFIG — change the notification address here (one place only).
+
+   FormSubmit needs a ONE-TIME ACTIVATION: the first submission to a new
+   address triggers a confirmation email to that address. Submissions are only
+   delivered after the activation link in that email has been clicked.
+   ========================================================================== */
+const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/YOUR_EMAIL@example.com";
+
+/* ==========================================================================
+   REFERENCE DATA
+   ========================================================================== */
+const COLUMNS    = ["Backlog", "In Progress", "Blocked", "Done"];
+const COLUMN_HINTS = {
+  "Backlog": "Logged, not yet scheduled",
+  "In Progress": "Actively being worked",
+  "Blocked": "Waiting on dependency, vendor or approval",
+  "Done": "Completed / closed"
+};
+const PROJECTS   = ["Core Banking Upgrade", "Digital Channels", "Cybersecurity Uplift",
+                    "Data & Analytics", "Infrastructure & Cloud", "Vendor Management"];
+const CATEGORIES = ["Application Development", "Infrastructure", "Cybersecurity",
+                    "Data", "Compliance", "Vendor"];
+const PRIORITIES = ["Critical", "High", "Medium", "Low"];
+
+/* ==========================================================================
+   STATE — single source of truth (in memory only; no storage APIs are used)
+   ========================================================================== */
+const state = {
+  tasks: [],
+  filters: { project: "", assignee: "", priority: "" }
+};
+// Transient UI state (which card is asking "Delete?", where to restore focus)
+const ui = { confirmDeleteId: null, focus: null, lastOpener: null };
+let nextIdCounter = 1;
+
+/* ==========================================================================
+   HELPERS
+   ========================================================================== */
+// Escape every user-supplied string before it is placed into HTML.
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function toISODate(d) {
+  const p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+function todayISO() { return toISODate(new Date()); }
+function offsetDate(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return toISODate(d);
+}
+function formatDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
+function isOverdue(task) {
+  return task.status !== "Done" && task.dueDate < todayISO(); // ISO strings compare lexically
+}
+function nextTaskId() {
+  return "UOB-ITPM-" + String(nextIdCounter++).padStart(4, "0");
+}
+function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
+
+/* ==========================================================================
+   SEED DATA — 8 demo tasks (dates relative to today so they stay realistic)
+   ========================================================================== */
+function seedTasks() {
+  const seed = [
+    ["Migrate FX pricing service to AWS", "Lift-and-shift the FX pricing engine into the new landing zone with blue/green cutover.",
+      "Infrastructure & Cloud", "Infrastructure", "Priya Nair", "High", 21, "In Progress"],
+    ["Patch CVE-2025-XXXX on branch teller VDI", "Roll out vendor security patch to all branch teller VDI golden images.",
+      "Cybersecurity Uplift", "Cybersecurity", "Daniel Tan", "Critical", -3, "In Progress"],
+    ["UAT sign-off for mobile onboarding release 4.2", "Collect business sign-off for the 4.2 onboarding journey.",
+      "Digital Channels", "Application Development", "Mei Ling Chua", "High", 6, "Blocked"],
+    ["Core ledger upgrade – performance baseline", "Capture pre-upgrade throughput baselines for batch and online windows.",
+      "Core Banking Upgrade", "Application Development", "Rahul Menon", "Medium", 30, "Backlog"],
+    ["Regulatory reporting data lineage mapping", "Document lineage for the quarterly regulatory return datasets.",
+      "Data & Analytics", "Compliance", "Aisha Rahman", "Medium", 14, "Backlog"],
+    ["Renew SIEM vendor support contract", "Negotiate and renew 3-year SIEM support; awaiting vendor revised quote.",
+      "Vendor Management", "Vendor", "Kenneth Lim", "Low", -5, "Blocked"],
+    ["Decommission legacy loan origination servers", "Power down and securely wipe the retired LOS server estate.",
+      "Infrastructure & Cloud", "Infrastructure", "Sofia Alvarez", "Low", 45, "Backlog"],
+    ["Deploy MFA to internal admin consoles", "Enforce MFA on all privileged admin consoles; evidence filed with Risk.",
+      "Cybersecurity Uplift", "Cybersecurity", "Daniel Tan", "High", -10, "Done"]
+  ];
+  return seed.map(s => ({
+    id: nextTaskId(), title: s[0], description: s[1], project: s[2], category: s[3],
+    assignee: s[4], priority: s[5], dueDate: offsetDate(s[6]), status: s[7]
+  }));
+}
+
+/* ==========================================================================
+   FILTERING — pure client-side over state.tasks
+   ========================================================================== */
+function applyFilters() {
+  const { project, assignee, priority } = state.filters;
+  const needle = assignee.trim().toLowerCase();
+  return state.tasks.filter(t =>
+    (!project || t.project === project) &&
+    (!priority || t.priority === priority) &&
+    (!needle || t.assignee.toLowerCase().includes(needle))
+  );
+}
+
+/* ==========================================================================
+   RENDERING — the only place card/column/summary HTML is produced
+   ========================================================================== */
+function renderCard(task) {
+  const overdue = isOverdue(task);
+  const id = escapeHtml(task.id);
+  const confirming = ui.confirmDeleteId === task.id;
+  const moveOptions = COLUMNS.filter(c => c !== task.status)
+    .map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+
+  const actions = confirming
+    ? `<span class="confirm" role="group" aria-label="Confirm delete ${id}">
+         Delete?
+         <button type="button" class="yes" data-action="delete-yes" data-id="${id}">Yes</button>
+         <button type="button" data-action="delete-no" data-id="${id}">No</button>
+       </span>`
+    : `<button type="button" class="del-btn" data-action="delete-ask" data-id="${id}"
+         aria-label="Delete task ${id}">&times;</button>`;
+
+  return `
+  <li class="card p-${slug(task.priority)}" draggable="true" data-id="${id}">
+    <div class="card-top">
+      <span class="card-id">${id}</span>
+      <span class="chips">
+        ${overdue ? '<span class="overdue">Overdue</span>' : ""}
+        <span class="pill ${slug(task.priority)}">${escapeHtml(task.priority)}</span>
+      </span>
+    </div>
+    <h3>${escapeHtml(task.title)}</h3>
+    ${task.description ? `<p class="desc">${escapeHtml(task.description)}</p>` : ""}
+    <dl class="meta">
+      <dt>Project</dt><dd>${escapeHtml(task.project)}</dd>
+      <dt>Assignee</dt><dd>${escapeHtml(task.assignee)}</dd>
+      <dt>Due</dt><dd>${escapeHtml(formatDate(task.dueDate))}</dd>
+    </dl>
+    <div class="chips"><span class="tag">${escapeHtml(task.category)}</span></div>
+    <div class="card-actions">
+      <select class="move-select" data-id="${id}" aria-label="Move task ${id} to another column">
+        <option value="" selected disabled>Move ▸</option>${moveOptions}
+      </select>
+      ${actions}
+    </div>
+  </li>`;
+}
+
+function renderSummary() {
+  const total = state.tasks.length;
+  const overdue = state.tasks.filter(isOverdue).length;
+  const items = [["Total", total]]
+    .concat(COLUMNS.map(c => [c, state.tasks.filter(t => t.status === c).length]))
+    .concat([["Overdue", overdue]]);
+  document.getElementById("summary").innerHTML = items.map(([label, n]) =>
+    `<li${label === "Overdue" && n > 0 ? ' class="is-overdue"' : ""}>
+       <span class="num">${n}</span><span class="lbl">${escapeHtml(label)}</span></li>`).join("");
+}
+
+function renderBoard() {
+  const visible = applyFilters();
+  document.getElementById("board").innerHTML = COLUMNS.map(status => {
+    const cards = visible.filter(t => t.status === status);
+    return `
+    <section class="column" data-status="${escapeHtml(status)}" aria-labelledby="col-${slug(status)}">
+      <div class="column-head">
+        <h2 id="col-${slug(status)}">${escapeHtml(status)}<span class="sub">${escapeHtml(COLUMN_HINTS[status])}</span></h2>
+        <span class="badge" aria-label="${cards.length} tasks">${cards.length}</span>
+      </div>
+      <ul class="dropzone">
+        ${cards.length ? cards.map(renderCard).join("") : '<li class="empty">No tasks here</li>'}
+      </ul>
+    </section>`;
+  }).join("");
+
+  renderSummary();
+  const note = document.getElementById("filter-note");
+  note.textContent = visible.length === state.tasks.length
+    ? "" : `Showing ${visible.length} of ${state.tasks.length} tasks`;
+
+  // Restore keyboard focus after a re-render (cards are rebuilt from state)
+  if (ui.focus) {
+    const card = document.querySelector(`.card[data-id="${ui.focus.id}"]`);
+    const el = card && card.querySelector(ui.focus.selector);
+    if (el) el.focus();
+    ui.focus = null;
+  }
+}
+
+/* ==========================================================================
+   ACTIONS — mutate state.tasks, then re-render
+   ========================================================================== */
+function addTask(data) {
+  const task = {
+    id: nextTaskId(),
+    title: data.title.trim(),
+    description: data.description.trim(),
+    project: data.project,
+    category: data.category,
+    assignee: data.assignee.trim(),
+    priority: data.priority,
+    dueDate: data.dueDate,
+    status: data.status
+  };
+  state.tasks.push(task);
+  renderBoard();
+  return task;
+}
+
+function moveTask(id, newStatus) {
+  const task = state.tasks.find(t => t.id === id);
+  if (!task || !COLUMNS.includes(newStatus) || task.status === newStatus) return;
+  task.status = newStatus;
+  ui.confirmDeleteId = null;
+  ui.focus = { id, selector: ".move-select" };
+  renderBoard();
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  ui.confirmDeleteId = null;
+  renderBoard();
+  showToast(`Deleted ${id}`);
+}
+
+/* ==========================================================================
+   TOASTS
+   ========================================================================== */
+function showToast(message, type = "ok") {
+  const el = document.createElement("div");
+  el.className = "toast" + (type === "warn" ? " warn" : "");
+  el.textContent = message; // textContent => safe
+  document.getElementById("toast-region").appendChild(el);
+  setTimeout(() => el.remove(), type === "warn" ? 6000 : 3500);
+}
+
+/* ==========================================================================
+   FORMSUBMIT — email notification (failure must never break the board)
+   ========================================================================== */
+async function notifyNewTask(task) {
+  if (FORMSUBMIT_ENDPOINT.includes("YOUR_EMAIL@example.com")) {
+    // Not configured yet: don't post to a placeholder address.
+    throw new Error("FormSubmit endpoint not configured");
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(FORMSUBMIT_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({
+        _subject: `[UOB IT PMO] New task ${task.id}: ${task.title}`,
+        _template: "table",
+        _captcha: "false",
+        "Task ID": task.id,
+        Title: task.title,
+        Description: task.description,
+        Project: task.project,
+        Category: task.category,
+        Assignee: task.assignee,
+        Priority: task.priority,
+        "Due Date": task.dueDate,
+        Status: task.status,
+        "Submitted At": new Date().toISOString()
+      })
+    });
+    if (!res.ok) throw new Error(`FormSubmit failed: ${res.status}`);
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/* ==========================================================================
+   FORM — read, validate, submit
+   ========================================================================== */
+const form = document.getElementById("task-form");
+const FIELD_IDS = { title: "t-title", description: "t-desc", assignee: "t-assignee", dueDate: "t-due" };
+
+function readForm() {
+  const fd = new FormData(form);
+  const out = {};
+  for (const [k, v] of fd.entries()) out[k] = String(v);
+  return out;
+}
+
+function setError(field, message) {
+  const input = document.getElementById(FIELD_IDS[field]);
+  document.getElementById(FIELD_IDS[field] + "-err").textContent = message;
+  if (message) input.setAttribute("aria-invalid", "true");
+  else input.removeAttribute("aria-invalid");
+}
+
+// Returns true when valid; writes inline errors otherwise (never alert()).
+function validateForm(data) {
+  const errors = {};
+  const title = data.title.trim();
+  if (!title) errors.title = "Task title is required.";
+  else if (title.length > 80) errors.title = "Title must be 80 characters or fewer.";
+  if (data.description.length > 500) errors.description = "Description must be 500 characters or fewer.";
+  if (!data.assignee.trim()) errors.assignee = "Assignee is required.";
+  if (!data.dueDate) errors.dueDate = "Due date is required.";
+  else if (data.dueDate < todayISO()) errors.dueDate = "Due date cannot be in the past.";
+
+  Object.keys(FIELD_IDS).forEach(f => setError(f, errors[f] || ""));
+  const first = Object.keys(FIELD_IDS).find(f => errors[f]);
+  if (first) document.getElementById(FIELD_IDS[first]).focus();
+  return !first;
+}
+
+function setSending(sending) {
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = sending;
+  btn.textContent = sending ? "Sending…" : "Add Task";
+}
+
+async function handleSubmit(event) {
+  event.preventDefault();
+  if (document.getElementById("submit-btn").disabled) return;
+  const data = readForm();
+  if (!validateForm(data)) return;
+
+  // Optimistic UI: the card appears immediately; email goes out in parallel.
+  const task = addTask(data);
+  showToast(`Added ${task.id} to ${task.status}`);
+  setSending(true);
+  try {
+    await notifyNewTask(task);
+  } catch (err) {
+    console.warn("Notification failed:", err);
+    showToast("Card added locally — email notification failed", "warn");
+  } finally {
+    setSending(false);
+    resetForm();
+    closeModal();
+  }
+}
+
+function resetForm() {
+  form.reset();
+  document.getElementById("t-priority").value = "Medium";
+  document.getElementById("t-status").value = "Backlog";
+  Object.keys(FIELD_IDS).forEach(f => setError(f, ""));
+  updateCounters();
+}
+
+function updateCounters() {
+  document.getElementById("t-title-count").textContent = document.getElementById("t-title").value.length + " / 80";
+  document.getElementById("t-desc-count").textContent = document.getElementById("t-desc").value.length + " / 500";
+}
+
+/* ==========================================================================
+   MODAL — open/close with focus management and a simple focus trap
+   ========================================================================== */
+const modal = document.getElementById("modal");
+
+function openModal() {
+  ui.lastOpener = document.activeElement;
+  document.getElementById("t-due").min = todayISO();
+  modal.hidden = false;
+  document.getElementById("t-title").focus();
+}
+function closeModal() {
+  modal.hidden = true;
+  if (ui.lastOpener && ui.lastOpener.focus) ui.lastOpener.focus();
+}
+function trapFocus(e) {
+  if (e.key === "Escape" && !modal.hidden && !document.getElementById("submit-btn").disabled) {
+    closeModal();
+    return;
+  }
+  if (e.key !== "Tab" || modal.hidden) return;
+  const items = [...modal.querySelectorAll("button, input, select, textarea")].filter(el => !el.disabled);
+  const first = items[0], last = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
+/* ==========================================================================
+   DRAG & DROP — native HTML5 API, delegated on the board
+   ========================================================================== */
+function initDragAndDrop() {
+  const board = document.getElementById("board");
+  const clearHighlights = () =>
+    board.querySelectorAll(".drag-over").forEach(c => c.classList.remove("drag-over"));
+
+  board.addEventListener("dragstart", e => {
+    const card = e.target.closest && e.target.closest(".card");
+    if (!card) return;
+    e.dataTransfer.setData("text/plain", card.dataset.id);
+    e.dataTransfer.effectAllowed = "move";
+    card.classList.add("dragging");
+  });
+  board.addEventListener("dragend", e => {
+    const card = e.target.closest && e.target.closest(".card");
+    if (card) card.classList.remove("dragging");
+    clearHighlights();
+  });
+  board.addEventListener("dragover", e => {
+    const col = e.target.closest(".column");
+    if (!col) return;
+    e.preventDefault(); // required to allow a drop
+    e.dataTransfer.dropEffect = "move";
+    if (!col.classList.contains("drag-over")) { clearHighlights(); col.classList.add("drag-over"); }
+  });
+  board.addEventListener("dragleave", e => {
+    const col = e.target.closest(".column");
+    if (col && !col.contains(e.relatedTarget)) col.classList.remove("drag-over");
+  });
+  board.addEventListener("drop", e => {
+    const col = e.target.closest(".column");
+    if (!col) return;
+    e.preventDefault();
+    const id = e.dataTransfer.getData("text/plain");
+    clearHighlights();
+    moveTask(id, col.dataset.status);
+  });
+}
+
+/* ==========================================================================
+   INIT — populate selects, wire events, first render
+   ========================================================================== */
+function fillSelect(select, values, selected) {
+  const keep = select.innerHTML; // keeps any leading "All …" option
+  select.innerHTML = keep + values.map(v =>
+    `<option value="${escapeHtml(v)}"${v === selected ? " selected" : ""}>${escapeHtml(v)}</option>`).join("");
+}
+
+function init() {
+  fillSelect(document.getElementById("f-project"), PROJECTS);
+  fillSelect(document.getElementById("f-priority"), PRIORITIES);
+  fillSelect(document.getElementById("t-project"), PROJECTS);
+  fillSelect(document.getElementById("t-category"), CATEGORIES);
+  fillSelect(document.getElementById("t-priority"), PRIORITIES, "Medium");
+  fillSelect(document.getElementById("t-status"), COLUMNS, "Backlog");
+
+  state.tasks = seedTasks();
+
+  // Filters
+  document.getElementById("f-project").addEventListener("change", e => { state.filters.project = e.target.value; renderBoard(); });
+  document.getElementById("f-priority").addEventListener("change", e => { state.filters.priority = e.target.value; renderBoard(); });
+  document.getElementById("f-assignee").addEventListener("input", e => { state.filters.assignee = e.target.value; renderBoard(); });
+  document.getElementById("f-clear").addEventListener("click", () => {
+    state.filters = { project: "", assignee: "", priority: "" };
+    document.getElementById("f-project").value = "";
+    document.getElementById("f-priority").value = "";
+    document.getElementById("f-assignee").value = "";
+    renderBoard();
+  });
+
+  // Board: Move select + delete controls (delegated)
+  const board = document.getElementById("board");
+  board.addEventListener("change", e => {
+    if (e.target.classList.contains("move-select")) moveTask(e.target.dataset.id, e.target.value);
+  });
+  board.addEventListener("click", e => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === "delete-ask") {
+      ui.confirmDeleteId = id;
+      ui.focus = { id, selector: ".confirm .no, .confirm button:last-child" };
+      renderBoard();
+    } else if (btn.dataset.action === "delete-no") {
+      ui.confirmDeleteId = null;
+      ui.focus = { id, selector: ".del-btn" };
+      renderBoard();
+    } else if (btn.dataset.action === "delete-yes") {
+      deleteTask(id);
+    }
+  });
+  initDragAndDrop();
+
+  // Modal + form
+  document.getElementById("open-add").addEventListener("click", openModal);
+  document.getElementById("close-add").addEventListener("click", closeModal);
+  document.getElementById("cancel-add").addEventListener("click", () => { resetForm(); closeModal(); });
+  modal.addEventListener("mousedown", e => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", trapFocus);
+  form.addEventListener("submit", handleSubmit);
+  form.addEventListener("input", updateCounters);
+
+  renderBoard();
+}
+
+init();
+</script>
+</body>
+</html>
