@@ -1,0 +1,26 @@
+# IT PMO Kanban Board
+
+[![CI](https://github.com/ramnaths2013/claude-training/actions/workflows/ci.yml/badge.svg)](https://github.com/ramnaths2013/claude-training/actions/workflows/ci.yml)
+[![Pages](https://github.com/ramnaths2013/claude-training/actions/workflows/pages.yml/badge.svg)](https://github.com/ramnaths2013/claude-training/actions/workflows/pages.yml)
+
+A single-page Kanban board for a fictitious bank's internal IT PMO. **Demo / training tool only.**
+
+**Live demo:** https://ramnaths2013.github.io/claude-training/
+
+## Features
+- Drag-and-drop cards between columns, plus a **Move ▸** select for keyboard use
+- Filters, inline delete confirmation (no `alert()`/`confirm()`)
+- Add-task form with inline validation and toast notifications
+- Responsive layout that stacks below 768px
+- 8 seeded tasks using the `UOB-ITPM-####` ID format
+
+## Run it
+Double-click `index.html`. No build step, server or install needed.
+
+## Constraints
+- Vanilla HTML/CSS/JS in one file, no frameworks or external resources
+- No persistence: board state resets to the seed data on refresh
+- The only network call is the optional FormSubmit new-task notification; a failure never breaks the board
+
+## Disclaimer
+The bank is fictitious. This project uses a neutral "IT PMO" wordmark and no real UOB logos or trademarks.
