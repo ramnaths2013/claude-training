@@ -3,55 +3,57 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IT PMO | Project board</title>
+<title>IT PMO Mission Board</title>
 <style>
 /* ==========================================================================
-   1. DESIGN TOKENS (locked in .ulpi/design/DESIGN.md; every value below
-      comes from here). Wabi-sabi: plaster ground, sumi ink, one indigo voice.
+   1. DESIGN TOKENS (every colour, space, radius and type value comes from here)
+   Layout concept: dark LCARS-style console. Coloured bars with rounded end caps
+   carry the structure; panels are dark; text is light. Unofficial homage, original
+   shapes and colours only.
    ========================================================================== */
 :root {
-  /* colour */
-  --ground:     #E4E5DE;
-  --surface:    #EEEFE9;
-  --card:       #F6F6F2;
-  --line:       #C9CBC2;
-  --sumi:       #23262B;
-  --muted:      #52565C;
-  --subtle:     #6A6E74;
-  --ai:         #2B4A6F;
-  --shu:        #A8362A;
-  --kaki:       #7F5210;
-  --kaki-edge:  #B97A1E;
-  --matsu:      #3A6348;
-  --nezumi:     #7A7E84;
-  --scrim:      rgba(35, 38, 43, .45);
+  /* surfaces */
+  --ground:   #090A12;
+  --panel:    #12142A;
+  --panel-2:  #1B1E3C;
+  --line:     #2A2E55;
+  --edge:     #6C70A8;   /* control borders, 3.5:1 on panel-2 */
+
+  /* text */
+  --text:     #ECEAFF;
+  --muted:    #B0ADCF;
+  --subtle:   #8E8BB0;
+  --ink:      #0A0A14;   /* text on coloured bars */
+
+  /* console colours */
+  --orange:   #FF9C42;   /* the one primary action colour */
+  --lavender: #C9A0E8;
+  --peri:     #8EA4FF;
+  --tan:      #E9C9A0;
+  --mint:     #6FD6B8;
+  --red:      #FF6B6B;
+  --yellow:   #FFC93C;
+  --violet:   #A39BC4;
+  --scrim:    rgba(9, 10, 18, .72);
 
   /* spacing scale: 4, 8, 12, 16, 24, 40, 64 */
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px;
-  --s-6: 40px;
-  --s-7: 64px;
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 40px; --s-7: 64px;
   --gutter: var(--s-6);
 
   /* radius scale */
-  --r-1: 2px;
-  --r-2: 6px;
-  --r-3: 10px;
-  --r-card: 2px 6px 3px 8px;
+  --r-1: 4px;
+  --r-2: 10px;
+  --r-cap: 28px;
   --r-pill: 999px;
+  --r-card: 4px 16px 16px 4px;
 
-  /* the one elevation */
-  --elevation: 0 1px 0 var(--line), 0 6px 14px -10px rgba(35, 38, 43, .35);
+  /* sparse star field: inline SVG, no image file */
+  --stars: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cg fill='%23ECEAFF'%3E%3Ccircle cx='24' cy='46' r='1' opacity='.5'/%3E%3Ccircle cx='96' cy='310' r='.8' opacity='.4'/%3E%3Ccircle cx='170' cy='120' r='1.2' opacity='.55'/%3E%3Ccircle cx='238' cy='372' r='.9' opacity='.4'/%3E%3Ccircle cx='300' cy='64' r='.8' opacity='.45'/%3E%3Ccircle cx='350' cy='230' r='1.1' opacity='.5'/%3E%3Ccircle cx='392' cy='350' r='.8' opacity='.35'/%3E%3Ccircle cx='60' cy='190' r='.7' opacity='.35'/%3E%3Ccircle cx='210' cy='250' r='.7' opacity='.3'/%3E%3C/g%3E%3C/svg%3E");
 
-  /* texture: faint inline SVG grain, no image file */
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
-
-  /* type: local stacks only, system-ui deliberately not first */
-  --font-display: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --font-body: "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", "Avenir Next", "Segoe UI", sans-serif;
+  /* type: local stacks only */
+  --font-display: "Avenir Next Condensed", "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
 
   /* motion */
@@ -73,237 +75,230 @@ body {
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.55;
-  color: var(--sumi);
-  background: var(--ground) var(--grain);
+  color: var(--text);
+  background: var(--ground) var(--stars);
 }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap;
 }
 .wrap { max-width: 1320px; margin: 0 auto; padding: 0 var(--gutter); }
+.label {
+  font-family: var(--font-display); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .14em; color: var(--lavender);
+}
 
 /* ==========================================================================
-   3. HEADER BAND + SUMMARY LINE (left-weighted, empty right on purpose)
+   3. HEADER: segmented bars, wordmark, stardate, summary capsules
    ========================================================================== */
-.app-header { background: var(--surface); padding: var(--s-5) 0 var(--s-4); }
+.app-header { padding: var(--s-5) 0 var(--s-4); }
+.bars { display: flex; gap: 6px; height: 26px; }
+.bars span { display: block; transform-origin: left center; animation: bar-in var(--dur-3) var(--ease) both; }
+.bars .b1 { flex: 0 0 148px; background: var(--orange); border-radius: 26px 0 0 26px; }
+.bars .b2 { flex: 2 1 0; background: var(--lavender); animation-delay: 60ms; }
+.bars .b3 { flex: 1 1 0; background: var(--peri); animation-delay: 120ms; }
+.bars .b4 { flex: 3 1 0; background: var(--tan); animation-delay: 180ms; }
+.bars .b5 { flex: 0 0 56px; background: var(--orange); border-radius: 0 26px 26px 0; animation-delay: 240ms; }
+@keyframes bar-in { from { transform: scaleX(0); } to { transform: none; } }
+
 .header-top {
-  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
-  gap: var(--s-4);
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: var(--s-4); margin-top: var(--s-5);
 }
-.wordmark { display: flex; align-items: baseline; gap: var(--s-3); }
+.wordmark { display: flex; flex-direction: column; gap: var(--s-1); }
 .wordmark strong {
-  position: relative; display: inline-block;
-  font-family: var(--font-display); font-weight: 500; font-size: 26px;
-  letter-spacing: .02em; line-height: 1.2;
+  font-family: var(--font-display); font-size: 34px; line-height: 1; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--orange);
 }
-.wordmark strong::after {
-  content: ""; position: absolute; left: 0; bottom: 0; width: 60%; height: 1px;
-  background: var(--ai); border-radius: var(--r-pill);
-}
-.wordmark span { font-size: 12px; color: var(--muted); }
+.wordmark span { font-family: var(--font-display); font-size: 14px; letter-spacing: .24em; text-transform: uppercase; color: var(--lavender); }
 .header-actions { display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-2); }
-.demo-note { font-size: 12px; color: var(--muted); margin: 0; text-align: right; max-width: 44ch; }
-.summary {
-  list-style: none; margin: var(--s-4) 0 0; padding: 0;
-  display: flex; flex-wrap: wrap; align-items: baseline; font-size: 14px; color: var(--muted);
+.stardate { margin: 0; font-family: var(--font-mono); font-size: 13px; letter-spacing: .06em; color: var(--peri); }
+.demo-note { margin: 0; max-width: 34ch; text-align: right; font-size: 12px; color: var(--muted); }
+
+.summary { list-style: none; margin: var(--s-5) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.summary li {
+  display: flex; align-items: baseline; gap: var(--s-2);
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: var(--s-1) var(--s-4);
 }
-.summary li { display: flex; align-items: baseline; gap: var(--s-1); }
-.summary li + li::before {
-  content: "\00b7"; content: "\00b7" / "";
-  margin: 0 var(--s-2); color: var(--subtle);
-}
-.summary .num { font-family: var(--font-mono); letter-spacing: .04em; color: var(--sumi); }
-.summary li.is-overdue, .summary li.is-overdue .num { color: var(--shu); }
+.summary .num { font-family: var(--font-mono); font-size: 16px; color: var(--orange); }
+.summary .lbl { font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+.summary li.is-overdue { border-color: var(--red); }
+.summary li.is-overdue .num, .summary li.is-overdue .lbl { color: var(--red); }
 
 /* ==========================================================================
    4. BUTTONS
    ========================================================================== */
 .btn {
-  border: 1px solid var(--ai); background: var(--ai); color: var(--card);
-  padding: var(--s-2) var(--s-4); border-radius: var(--r-1); font-weight: 500;
-  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+  border: 0; background: var(--orange); color: var(--ink);
+  font-family: var(--font-display); font-weight: 700; font-size: 14px;
+  text-transform: uppercase; letter-spacing: .12em;
+  padding: var(--s-2) var(--s-5); border-radius: var(--r-pill);
+  transition: filter var(--dur-1) var(--ease);
 }
-.btn:hover { background: var(--sumi); border-color: var(--sumi); }
+.btn:hover { filter: brightness(1.12); }
 .btn:disabled { opacity: .6; cursor: progress; }
-.btn-ghost { background: transparent; color: var(--sumi); border-color: var(--subtle); }
-.btn-ghost:hover { background: var(--card); border-color: var(--sumi); }
+.btn-ghost { background: transparent; color: var(--orange); box-shadow: inset 0 0 0 2px var(--orange); }
+.btn-ghost:hover { background: var(--panel-2); filter: none; }
 .btn-text {
   display: inline-flex; align-items: center; gap: var(--s-2);
-  background: transparent; border: 1px solid transparent; color: var(--ai);
-  padding: var(--s-2) var(--s-1); border-radius: var(--r-1);
-  text-decoration: underline; text-underline-offset: 3px;
+  background: none; border: 0; padding: var(--s-1) 0;
+  color: var(--lavender); text-decoration: underline; text-underline-offset: 3px;
 }
-.btn-text:hover { color: var(--sumi); }
+.btn-text:hover { color: var(--text); }
 .btn-text svg { width: 16px; height: 16px; flex: none; }
-.btn-text path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+.btn-text path { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
 
 /* ==========================================================================
-   5. FILTER ROW (hairline-bounded, labels above fields)
+   5. FILTER ROW
    ========================================================================== */
-.filters { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.filters .wrap {
-  display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s-4);
-  padding-top: var(--s-3); padding-bottom: var(--s-3);
-}
-.filters .field { display: flex; flex-direction: column; gap: var(--s-1); min-width: 180px; }
+.filters { padding: var(--s-3) 0 var(--s-4); }
+.filters .wrap { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s-4); }
+.field { display: flex; flex-direction: column; gap: var(--s-1); }
+.filters .field { min-width: 180px; }
 .filters label, form label {
-  font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+  font-family: var(--font-display); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .14em; color: var(--lavender);
 }
-.filters .count-note { margin-left: auto; font-size: 12px; color: var(--muted); align-self: center; }
-
-/* shared control look: 2px radius, bottom-weighted line */
-input[type="text"], input[type="date"], select, textarea {
-  border: 1px solid var(--line); border-bottom-color: var(--subtle);
-  border-radius: var(--r-1); padding: var(--s-2) var(--s-3);
-  background: var(--card); width: 100%;
+select, input[type="text"], input[type="date"], textarea {
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--edge); border-radius: var(--r-2);
+  padding: var(--s-2) var(--s-3); width: 100%;
 }
+select { color-scheme: dark; }
+input[type="date"] { color-scheme: dark; }
+::placeholder { color: var(--subtle); }
+.count-note { margin-left: auto; font-size: 12px; color: var(--muted); }
 
 /* ==========================================================================
-   6. BOARD + COLUMNS (no fill, no border; structure is space)
+   6. BOARD + COLUMNS: header bar with rounded cap, count capsule, left rail
    ========================================================================== */
-.board {
-  max-width: 1320px; margin: 0 auto;
-  padding: var(--s-6) var(--gutter) var(--s-7);
-  display: flex; gap: var(--s-6); align-items: stretch;
-}
-.column {
-  position: relative; flex: 1 1 0; min-width: 0; min-height: 220px;
-  padding: var(--s-4) var(--s-2) var(--s-4);
-  display: flex; flex-direction: column;
-  transition: background var(--dur-2) var(--ease);
-}
-.column::before {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--line);
-  transition: height var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
-}
-.column.drag-over { background: var(--surface); }
-.column.drag-over::before { height: 2px; background: var(--ai); }
+.board { display: flex; gap: var(--s-5); align-items: flex-start; padding: var(--s-4) var(--gutter) var(--s-6); max-width: 1320px; margin: 0 auto; }
+.column { flex: 1 1 0; min-width: 0; --col: var(--lavender); }
+.column[data-status="Backlog"]     { --col: var(--lavender); }
+.column[data-status="In Progress"] { --col: var(--peri); }
+.column[data-status="Blocked"]     { --col: var(--orange); }
+.column[data-status="Done"]        { --col: var(--tan); }
 .column-head {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-3);
-  padding: 0 0 var(--s-4);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-3);
+  background: var(--col); color: var(--ink);
+  border-radius: var(--r-cap) 8px 8px var(--r-cap);
+  padding: var(--s-2) var(--s-3) var(--s-2) var(--s-5);
+  transition: filter var(--dur-2) var(--ease);
 }
 .column-head h2 {
-  margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 20px;
-  letter-spacing: .02em; line-height: 1.3;
+  margin: 0; font-family: var(--font-display); font-size: 20px; line-height: 1.1;
+  text-transform: uppercase; letter-spacing: .1em;
 }
-.column-head .sub { margin: var(--s-1) 0 0; font-size: 12px; color: var(--muted); }
-
-/* the open enso: signature count mark */
-.badge { flex: none; display: inline-flex; color: var(--ai); }
-.column[data-status="Done"] .badge { color: var(--matsu); }
-.enso { width: 40px; height: 40px; display: block; }
-.enso .arc { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.enso .arc-start { stroke-width: 3.5; }
-.enso text {
-  fill: var(--sumi); font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em;
-  text-anchor: middle; dominant-baseline: central;
+.column-head .sub { margin: 2px 0 0; font-size: 12px; line-height: 1.3; }
+.badge { flex: none; }
+.cap {
+  display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-width: 44px;
+  background: var(--ink); color: var(--col); border-radius: var(--r-pill); padding: 3px 10px 5px;
+  font-family: var(--font-mono); font-size: 16px; line-height: 1.1; text-align: center;
 }
-.enso.sweep .arc { animation: sweep var(--dur-3) var(--ease) both; }
-.enso.sweep .arc-start { animation-duration: calc(var(--dur-3) * .2); }
-@keyframes sweep {
-  from { stroke-dasharray: 1; stroke-dashoffset: 1; }
-  to   { stroke-dasharray: 1; stroke-dashoffset: 0; }
-}
-
+.cap .meter { display: block; height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.cap .meter i { display: block; height: 100%; background: var(--col); transition: width var(--dur-2) var(--ease); }
 .dropzone {
-  list-style: none; margin: 0; padding: 0;
-  display: flex; flex-direction: column; gap: var(--s-4); flex: 1;
+  list-style: none; margin: 6px 0 0; padding: var(--s-3) 0 var(--s-3) var(--s-3);
+  border-left: 8px solid var(--col); border-radius: 0 0 0 var(--s-5);
+  display: flex; flex-direction: column; gap: var(--s-3); min-height: 120px;
+  transition: background var(--dur-2) var(--ease);
 }
+.column.drag-over .column-head { filter: brightness(1.15); }
+.column.drag-over .dropzone { background: var(--panel); outline: 2px dashed var(--col); outline-offset: -4px; }
 .empty {
-  color: var(--muted); font-size: 12px; text-align: center; padding: var(--s-5) var(--s-4);
-  border: 1px dashed var(--line); border-radius: var(--r-1);
+  color: var(--muted); font-size: 12px; text-align: center; padding: var(--s-4);
+  border: 1px dashed var(--edge); border-radius: var(--r-2);
 }
 
 /* ==========================================================================
    7. CARDS
    ========================================================================== */
 .card {
-  position: relative;
-  background: var(--card);
-  border-radius: var(--r-card);
-  border-left: 3px solid var(--nezumi);
-  box-shadow: var(--elevation);
-  padding: var(--s-4);
-  display: flex; flex-direction: column; gap: var(--s-2);
-  cursor: grab;
+  background: var(--panel); border-radius: var(--r-card);
+  border: 1px solid var(--line); border-left: 6px solid var(--violet);
+  padding: var(--s-3) var(--s-4); display: flex; flex-direction: column; gap: var(--s-2); cursor: grab;
   transition: opacity var(--dur-1) var(--ease);
 }
-.card.p-critical { border-left-color: var(--shu); }
-.card.p-high     { border-left-color: var(--kaki-edge); }
-.card.p-medium   { border-left-color: var(--ai); }
-.card.p-low      { border-left-color: var(--nezumi); }
-.card.dragging   { opacity: .45; }
+.card.p-critical { border-left-color: var(--red); }
+.card.p-high     { border-left-color: var(--yellow); }
+.card.p-medium   { border-left-color: var(--peri); }
+.card.p-low      { border-left-color: var(--violet); }
+.card.dragging { opacity: .45; }
 .card-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); flex-wrap: wrap; }
-.card-id { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--subtle); }
-.card h3 {
-  margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 16px;
-  letter-spacing: .02em; line-height: 1.35; overflow-wrap: anywhere;
-}
+.card-id { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--peri); }
+.card h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
 .card .desc {
   margin: 0; font-size: 12px; color: var(--muted); overflow-wrap: anywhere;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: var(--s-1) var(--s-3); font-size: 12px; }
-.meta dt { color: var(--muted); }
+.meta dt { color: var(--lavender); font-family: var(--font-display); text-transform: uppercase; letter-spacing: .1em; }
 .meta dd { margin: 0; overflow-wrap: anywhere; }
 .chips { display: flex; flex-wrap: wrap; gap: var(--s-1); align-items: center; }
-.pill, .overdue {
-  font-size: 11px; letter-spacing: .08em; padding: 0 var(--s-2); border-radius: var(--r-pill);
-  white-space: nowrap; background: transparent; border: 1px solid currentColor; line-height: 1.6;
+.pill, .tag, .overdue {
+  font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; padding: 1px var(--s-2); border-radius: var(--r-pill); white-space: nowrap;
 }
-.pill.critical { color: var(--shu); }
-.pill.high     { color: var(--kaki); }
-.pill.medium   { color: var(--ai); }
-.pill.low      { color: var(--muted); }
-.overdue { color: var(--shu); }
-.tag {
-  font-size: 12px; color: var(--muted);
-  border-bottom: 1px solid var(--line); padding-bottom: 1px;
-}
-.card-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); margin-top: var(--s-1); }
-.move-select {
-  padding: var(--s-1) var(--s-2); font-size: 12px; max-width: 128px; width: auto;
-  border: 1px solid var(--line); border-bottom-color: var(--subtle); border-radius: var(--r-1); background: var(--card);
-}
+.pill { border: 1px solid currentColor; background: transparent; }
+.pill.critical { color: var(--red); }
+.pill.high     { color: var(--yellow); }
+.pill.medium   { color: var(--peri); }
+.pill.low      { color: var(--violet); }
+.tag { color: var(--lavender); border: 1px solid var(--edge); font-weight: 600; }
+.overdue { background: var(--red); color: var(--ink); }
+.card-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-2); margin-top: var(--s-1); }
+.move-select { width: auto; max-width: 130px; padding: 2px var(--s-2); font-size: 12px; border-radius: var(--r-1); }
 .del-btn {
-  border: 1px solid transparent; background: transparent; color: var(--muted);
-  width: 32px; height: 32px; border-radius: var(--r-1); font-size: 20px; line-height: 1; padding: 0;
+  width: 28px; height: 28px; padding: 0; border: 1px solid transparent; border-radius: 50%;
+  background: transparent; color: var(--muted); font-size: 18px; line-height: 1;
 }
-.del-btn:hover { border-color: var(--shu); color: var(--shu); }
-.confirm { display: flex; align-items: center; gap: var(--s-2); font-size: 12px; color: var(--shu); }
+.del-btn:hover { background: var(--panel-2); color: var(--red); }
+.confirm { display: flex; align-items: center; gap: var(--s-1); font-size: 12px; font-weight: 600; margin-left: auto; }
 .confirm button {
-  border: 1px solid var(--subtle); border-radius: var(--r-1); padding: var(--s-1) var(--s-3);
-  background: transparent; color: var(--sumi); font-size: 12px;
+  border: 1px solid var(--edge); border-radius: var(--r-pill); padding: 1px var(--s-3);
+  background: transparent; color: var(--text); font-size: 12px;
 }
-.confirm .yes { background: var(--shu); border-color: var(--shu); color: var(--card); }
+.confirm .yes { background: var(--red); border-color: var(--red); color: var(--ink); }
 
 /* ==========================================================================
-   8. MODAL + FORM
+   8. DIALOGS (new mission form, incoming transmission) + FORM
    ========================================================================== */
 .backdrop {
-  position: fixed; inset: 0; background: var(--scrim);
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: var(--s-5) var(--s-4); overflow-y: auto; z-index: 20;
+  position: fixed; inset: 0; background: var(--scrim); z-index: 20; overflow-y: auto;
+  display: flex; align-items: flex-start; justify-content: center; padding: var(--s-5) var(--s-4);
 }
 .backdrop[hidden] { display: none; }
-.modal { background: var(--card); border-radius: var(--r-3); width: 100%; max-width: 560px; }
+.modal {
+  width: 100%; max-width: 580px; background: var(--panel); color: var(--text);
+  border: 2px solid var(--orange); border-radius: var(--r-cap) 12px 12px 12px; overflow: hidden;
+}
 .modal-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: var(--s-4) var(--s-5); border-bottom: 1px solid var(--line);
+  background: var(--orange); color: var(--ink); padding: var(--s-3) var(--s-4) var(--s-3) var(--s-5);
 }
-.modal-head h2 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 20px; letter-spacing: .02em; }
-form { padding: var(--s-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4) var(--s-5); }
-.field { display: flex; flex-direction: column; gap: var(--s-1); }
+.modal-head h2 { margin: 0; font-family: var(--font-display); font-size: 20px; text-transform: uppercase; letter-spacing: .12em; }
+.modal-head .del-btn { color: var(--ink); }
+.modal-head .del-btn:hover { background: rgba(10, 10, 20, .15); color: var(--ink); }
+form { padding: var(--s-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
 .field.full { grid-column: 1 / -1; }
-.req { color: var(--shu); }
-textarea { resize: vertical; min-height: 80px; }
-input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--shu); }
-.error { color: var(--shu); font-size: 12px; margin: 0; }
+.req { color: var(--red); }
+textarea { resize: vertical; min-height: 84px; }
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--red); }
+.error { margin: 0; font-size: 12px; color: var(--red); }
 .counter { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; color: var(--subtle); text-align: right; }
 .form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: var(--s-3); }
+
+.modal.notice { max-width: 440px; border-color: var(--peri); }
+.modal.notice .modal-head { background: var(--peri); }
+.notice-body { padding: var(--s-5); display: grid; gap: var(--s-4); }
+.notice-body p { margin: 0; font-size: 14px; }
+.notice-body .meta { font-size: 14px; gap: var(--s-2) var(--s-4); }
+.notice-actions { display: flex; justify-content: flex-end; }
 
 /* ==========================================================================
    9. TOASTS
@@ -313,15 +308,15 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
   display: flex; flex-direction: column; gap: var(--s-2); max-width: min(380px, calc(100vw - 32px));
 }
 .toast {
-  padding: var(--s-3) var(--s-4); border-radius: var(--r-1); box-shadow: var(--elevation);
-  background: var(--sumi); color: var(--card); border-left: 3px solid var(--matsu);
+  padding: var(--s-3) var(--s-4); border-radius: var(--r-1) var(--r-2) var(--r-2) var(--r-1);
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--edge); border-left: 6px solid var(--mint);
   animation: toast-in var(--dur-2) var(--ease) both;
 }
-.toast.warn { background: var(--card); color: var(--kaki); border-left-color: var(--kaki-edge); }
+.toast.warn { border-left-color: var(--yellow); }
 @keyframes toast-in { from { opacity: 0; transform: translateY(var(--s-2)); } to { opacity: 1; transform: none; } }
 
 /* ==========================================================================
-   9b. IT ASSISTANT CHATBOT (avatar button + panel), tokens only
+   9b. SHIP'S COMPUTER: droid avatar button + chat panel
    ========================================================================== */
 .chat {
   position: fixed; z-index: 15;
@@ -331,81 +326,80 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 }
 .chat-fab {
   width: 56px; height: 56px; padding: 0; border: 0; border-radius: 50%;
-  background: var(--ai); box-shadow: var(--elevation); cursor: pointer;
-  transition: transform var(--dur-1) var(--ease);
+  background: var(--orange); transition: transform var(--dur-1) var(--ease);
 }
 .chat-fab:hover { transform: translateY(-2px); }
 .chat-fab svg { width: 56px; height: 56px; display: block; }
-.chat-fab .face { fill: var(--card); }
-.chat-fab .eye { fill: var(--sumi); transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
-.chat-fab .blush { fill: var(--shu); opacity: .35; }
-.chat-fab .line { fill: none; stroke: var(--sumi); stroke-width: 1.6; stroke-linecap: round; }
-.chat-fab .tuft { fill: none; stroke: var(--card); stroke-width: 2; stroke-linecap: round; }
-.chat-fab .tip { fill: var(--card); }
+.chat-fab .head { fill: var(--ground); }
+.chat-fab .visor { fill: var(--peri); }
+.chat-fab .eye { fill: var(--ink); transform-box: fill-box; transform-origin: center; animation: blink 5s infinite; }
+.chat-fab .cheek { fill: var(--orange); opacity: .8; }
+.chat-fab .mouth { fill: none; stroke: var(--text); stroke-width: 1.6; stroke-linecap: round; }
+.chat-fab .ant { fill: none; stroke: var(--ground); stroke-width: 2; stroke-linecap: round; }
+.chat-fab .tip { fill: var(--ground); }
 @keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
 @media (prefers-reduced-motion: reduce) { .chat-fab .eye { animation: none; } }
 
 .chat-panel {
   width: 360px; max-width: calc(100vw - 2 * var(--s-4)); max-height: min(70vh, 560px);
-  display: flex; flex-direction: column;
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--r-card); box-shadow: var(--elevation);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--panel); border: 2px solid var(--lavender); border-radius: var(--r-cap) 12px 12px 12px;
 }
 .chat-panel[hidden] { display: none; }
 .chat-head {
   display: flex; align-items: center; justify-content: space-between; gap: var(--s-2);
-  padding: var(--s-3) var(--s-4); border-bottom: 1px solid var(--line);
+  background: var(--lavender); color: var(--ink); padding: var(--s-2) var(--s-3) var(--s-2) var(--s-5);
 }
-.chat-head h2 { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 16px; letter-spacing: .02em; }
+.chat-head h2 { margin: 0; font-family: var(--font-display); font-size: 16px; text-transform: uppercase; letter-spacing: .12em; }
+.chat-head .btn-text { color: var(--ink); }
+.chat-head .del-btn { color: var(--ink); }
+.chat-head .del-btn:hover { background: rgba(10, 10, 20, .15); color: var(--ink); }
 .chat-head-actions { display: flex; align-items: center; gap: var(--s-2); }
-.chat-log {
-  flex: 1 1 auto; min-height: 120px; overflow-y: auto;
-  padding: var(--s-3) var(--s-4); display: flex; flex-direction: column; gap: var(--s-3);
-}
-.msg { max-width: 88%; padding: var(--s-2) var(--s-3); border-radius: var(--r-card); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.chat-log { flex: 1 1 auto; min-height: 120px; overflow-y: auto; padding: var(--s-3) var(--s-4); display: flex; flex-direction: column; gap: var(--s-3); }
+.msg { max-width: 90%; padding: var(--s-2) var(--s-3); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 .msg p { margin: 0; }
-.msg-bot { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); }
-.msg-user { align-self: flex-end; background: var(--ai); color: var(--card); }
+.msg-bot { align-self: flex-start; background: var(--panel-2); border-left: 4px solid var(--peri); border-radius: 4px 14px 14px 4px; }
+.msg-user { align-self: flex-end; background: var(--orange); color: var(--ink); border-radius: 14px 4px 4px 14px; }
 .msg-src { list-style: none; margin: var(--s-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-2); font-size: 12px; color: var(--muted); }
-.src-tag { display: block; font-family: var(--font-mono); letter-spacing: .04em; color: var(--ai); }
+.src-tag { display: block; font-family: var(--font-mono); letter-spacing: .04em; color: var(--peri); }
 .chat-note { margin: 0; padding: 0 var(--s-4) var(--s-2); font-size: 12px; color: var(--muted); }
 .chat-chips { display: flex; flex-wrap: wrap; gap: var(--s-2); padding: 0 var(--s-4) var(--s-3); }
 .chat-chip {
-  border: 1px solid var(--line); background: transparent; color: var(--ai);
-  border-radius: var(--r-pill); padding: var(--s-1) var(--s-3); font-size: 12px; cursor: pointer;
+  border: 1px solid var(--lavender); background: transparent; color: var(--lavender);
+  border-radius: var(--r-pill); padding: var(--s-1) var(--s-3); font-size: 12px;
 }
-.chat-chip:hover { background: var(--surface); }
+.chat-chip:hover { background: var(--panel-2); }
 .chat-form { display: flex; gap: var(--s-2); padding: var(--s-3) var(--s-4); border-top: 1px solid var(--line); }
 .chat-form input { flex: 1 1 auto; min-width: 0; }
 
 /* ==========================================================================
-   9c. MEETING NOTICE (in-page alert dialog shown after 10 seconds)
+   9c. FOOTER (disclaimer + closing bars)
    ========================================================================== */
-.modal.notice { max-width: 420px; }
-.notice-body { padding: var(--s-5); display: grid; gap: var(--s-4); }
-.notice-body p { margin: 0; font-size: 14px; }
-.notice-body .meta { font-size: 14px; gap: var(--s-2) var(--s-4); }
-.notice-actions { display: flex; justify-content: flex-end; }
+.site-foot { padding: var(--s-4) 0 calc(var(--s-7) + var(--s-5)); }
+.site-foot .bars { height: 14px; margin-bottom: var(--s-4); }
+.site-foot .bars .b1 { flex-basis: 96px; border-radius: 14px 0 0 14px; }
+.site-foot .bars .b5 { flex-basis: 32px; border-radius: 0 14px 14px 0; }
+.site-foot p { margin: 0; font-size: 12px; color: var(--muted); max-width: 70ch; }
 
 /* ==========================================================================
    10. RESPONSIVE: two rows of two below 1024px, stacked below 768px
    ========================================================================== */
 @media (max-width: 1023px) {
-  .board { flex-wrap: wrap; gap: var(--s-5); }
+  .board { flex-wrap: wrap; }
   .column { flex: 1 1 calc(50% - var(--s-4)); }
 }
 @media (max-width: 767px) {
   :root { --gutter: var(--s-4); }
-  .board { flex-direction: column; flex-wrap: nowrap; padding-top: var(--s-5); }
-  .column { flex: 0 0 auto; min-height: 0; }
+  .bars .b1 { flex-basis: 84px; }
+  .wordmark strong { font-size: 28px; }
+  .board { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+  .column { flex: 0 0 auto; }
   .header-actions { align-items: flex-start; width: 100%; }
   .demo-note { text-align: left; }
   .filters .field { flex: 1 1 100%; }
-  .filters .count-note { margin-left: 0; }
+  .count-note { margin-left: 0; }
   form { grid-template-columns: 1fr; padding: var(--s-4); }
-  .btn, .btn-text, select, input[type="text"], input[type="date"], .del-btn, .confirm button, .chat-chip {
-    min-height: 44px;
-  }
+  .btn, .btn-text, select, input[type="text"], input[type="date"], .del-btn, .confirm button, .chat-chip { min-height: 44px; }
   .del-btn { min-width: 44px; }
   .confirm button { min-width: 44px; }
   .move-select { max-width: none; flex: 1 1 auto; margin-right: var(--s-3); }
@@ -417,14 +411,16 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 <!-- ============================ HEADER + SUMMARY ============================ -->
 <header class="app-header">
   <div class="wrap">
+    <div class="bars" aria-hidden="true"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span><span class="b5"></span></div>
     <div class="header-top">
       <div class="wordmark" aria-label="IT PMO">
         <strong>IT PMO</strong>
-        <span>Project board</span>
+        <span>Mission board</span>
       </div>
       <div class="header-actions">
-        <button type="button" class="btn" id="open-add">+ Add task</button>
-        <p class="demo-note">Demo data only. The board resets to its seed tasks when you refresh the page.</p>
+        <p class="stardate" id="stardate"></p>
+        <button type="button" class="btn" id="open-add">+ New mission</button>
+        <p class="demo-note">Simulation only. The board resets to its seed missions when you refresh the page.</p>
       </div>
     </div>
     <ul class="summary" id="summary" aria-label="Board summary"></ul>
@@ -432,19 +428,19 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 </header>
 
 <!-- ============================== FILTER ROW =============================== -->
-<section class="filters" aria-label="Filter tasks">
+<section class="filters" aria-label="Filter missions">
   <div class="wrap">
     <div class="field">
       <label for="f-project">Project</label>
       <select id="f-project"><option value="">All projects</option></select>
     </div>
     <div class="field">
-      <label for="f-assignee">Assignee</label>
+      <label for="f-assignee">Officer</label>
       <input type="text" id="f-assignee" placeholder="e.g. Tan" autocomplete="off">
     </div>
     <div class="field">
-      <label for="f-priority">Priority</label>
-      <select id="f-priority"><option value="">All priorities</option></select>
+      <label for="f-priority">Alert level</label>
+      <select id="f-priority"><option value="">All alert levels</option></select>
     </div>
     <button type="button" class="btn-text" id="f-clear">
       <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M11 2.8 A6 6 0 1 1 2.8 5"/></svg>
@@ -457,22 +453,22 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 <!-- ================================= BOARD ================================= -->
 <main class="board" id="board"></main>
 
-<!-- ============================== ADD TASK MODAL ============================ -->
+<!-- ============================ NEW MISSION DIALOG ============================ -->
 <div class="backdrop" id="modal" hidden>
   <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-head">
-      <h2 id="modal-title">Add task</h2>
-      <button type="button" class="del-btn" id="close-add" aria-label="Close add task dialog">&times;</button>
+      <h2 id="modal-title">Log new mission</h2>
+      <button type="button" class="del-btn" id="close-add" aria-label="Close new mission dialog">&times;</button>
     </div>
     <form id="task-form" novalidate>
       <div class="field full">
-        <label for="t-title">Task title <span class="req" aria-hidden="true">*</span></label>
+        <label for="t-title">Mission title <span class="req" aria-hidden="true">*</span></label>
         <input type="text" id="t-title" name="title" maxlength="80" aria-describedby="t-title-err" autocomplete="off">
         <span class="counter" id="t-title-count">0 / 80</span>
         <p class="error" id="t-title-err"></p>
       </div>
       <div class="field full">
-        <label for="t-desc">Description</label>
+        <label for="t-desc">Mission brief</label>
         <textarea id="t-desc" name="description" maxlength="500" aria-describedby="t-desc-err"></textarea>
         <span class="counter" id="t-desc-count">0 / 500</span>
         <p class="error" id="t-desc-err"></p>
@@ -486,7 +482,7 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
         <select id="t-category" name="category"></select>
       </div>
       <div class="field">
-        <label for="t-assignee">Assignee <span class="req" aria-hidden="true">*</span></label>
+        <label for="t-assignee">Officer <span class="req" aria-hidden="true">*</span></label>
         <input type="text" id="t-assignee" name="assignee" aria-describedby="t-assignee-err" autocomplete="off">
         <p class="error" id="t-assignee-err"></p>
       </div>
@@ -496,44 +492,44 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
         <p class="error" id="t-due-err"></p>
       </div>
       <div class="field">
-        <label for="t-priority">Priority</label>
+        <label for="t-priority">Alert level</label>
         <select id="t-priority" name="priority"></select>
       </div>
       <div class="field">
-        <label for="t-status">Status</label>
+        <label for="t-status">Mission status</label>
         <select id="t-status" name="status"></select>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-ghost" id="cancel-add">Cancel</button>
-        <button type="submit" class="btn" id="submit-btn">Add task</button>
+        <button type="submit" class="btn" id="submit-btn">Log mission</button>
       </div>
     </form>
   </section>
 </div>
 
-<!-- ============================ MEETING NOTICE ============================ -->
+<!-- ============================ INCOMING TRANSMISSION ============================ -->
 <div class="backdrop" id="notice" hidden>
   <section class="modal notice" role="alertdialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-text">
     <div class="modal-head">
-      <h2 id="notice-title">IT meeting reminder</h2>
-      <button type="button" class="del-btn" id="notice-x" aria-label="Close reminder">&times;</button>
+      <h2 id="notice-title">Incoming transmission</h2>
+      <button type="button" class="del-btn" id="notice-x" aria-label="Close transmission">&times;</button>
     </div>
     <div class="notice-body">
-      <p id="notice-text">There is an IT meeting next Wednesday. Please attend.</p>
+      <p id="notice-text">All hands: there is an IT meeting next Wednesday. Attendance is requested.</p>
       <dl class="meta">
         <dt>When</dt><dd id="notice-when"></dd>
         <dt>Where</dt><dd id="notice-where"></dd>
       </dl>
-      <div class="notice-actions"><button type="button" class="btn" id="notice-ok">Got it</button></div>
+      <div class="notice-actions"><button type="button" class="btn" id="notice-ok">Acknowledged</button></div>
     </div>
   </section>
 </div>
 
-<!-- ============================ IT ASSISTANT CHATBOT ============================ -->
+<!-- ============================ SHIP'S COMPUTER (CHATBOT) ============================ -->
 <div class="chat" id="chat">
-  <section class="chat-panel" id="chat-panel" role="dialog" aria-label="IT assistant" hidden>
+  <section class="chat-panel" id="chat-panel" role="dialog" aria-label="Ship's computer, IT assistant" hidden>
     <header class="chat-head">
-      <h2>IT assistant</h2>
+      <h2>Ship's computer</h2>
       <div class="chat-head-actions">
         <button type="button" class="btn-text" id="chat-mute" aria-pressed="false">Voice on</button>
         <button type="button" class="del-btn" id="chat-close" aria-label="Close IT assistant">&times;</button>
@@ -544,26 +540,35 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
     <div class="chat-chips" id="chat-chips"></div>
     <form class="chat-form" id="chat-form">
       <label class="visually-hidden" for="chat-input">Ask the IT assistant</label>
-      <input type="text" id="chat-input" maxlength="200" autocomplete="off" placeholder="Ask about tasks or IT help">
+      <input type="text" id="chat-input" maxlength="200" autocomplete="off" placeholder="Ask about missions or IT help">
       <button type="submit" class="btn">Send</button>
     </form>
   </section>
   <button type="button" class="chat-fab" id="chat-fab" aria-label="Open IT assistant" aria-expanded="false" aria-controls="chat-panel">
     <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-      <path class="tuft" d="M32 14 C29 9 30 6 34 5"/>
-      <circle class="tip" cx="34.5" cy="5" r="2.2"/>
-      <ellipse class="face" cx="32" cy="35" rx="22" ry="19"/>
-      <ellipse class="eye" cx="24" cy="34" rx="2.6" ry="3.4"/>
-      <ellipse class="eye" cx="40" cy="34" rx="2.6" ry="3.4"/>
-      <ellipse class="blush" cx="19.5" cy="41" rx="3.6" ry="2.2"/>
-      <ellipse class="blush" cx="44.5" cy="41" rx="3.6" ry="2.2"/>
-      <path class="line" d="M28 42 Q32 46.5 36 42"/>
+      <path class="ant" d="M32 15 L32 8"/>
+      <circle class="tip" cx="32" cy="6.5" r="2.4"/>
+      <rect class="head" x="11" y="15" width="42" height="36" rx="15"/>
+      <rect class="visor" x="17" y="26" width="30" height="11" rx="5.5"/>
+      <ellipse class="eye" cx="26" cy="31.5" rx="2.4" ry="3"/>
+      <ellipse class="eye" cx="38" cy="31.5" rx="2.4" ry="3"/>
+      <circle class="cheek" cx="19" cy="42" r="2.6"/>
+      <circle class="cheek" cx="45" cy="42" r="2.6"/>
+      <path class="mouth" d="M28 43 Q32 47 36 43"/>
     </svg>
   </button>
 </div>
 
 <!-- ============================== TOAST REGION ============================== -->
 <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="false"></div>
+
+<!-- ================================= FOOTER ================================= -->
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="bars" aria-hidden="true"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span><span class="b5"></span></div>
+    <p>Unofficial fan-style homage for a fictitious bank's IT PMO training demo. Not affiliated with or endorsed by the owners of Star Trek. No official logos, insignia or fonts are used.</p>
+  </div>
+</footer>
 
 <script>
 "use strict";
@@ -581,12 +586,22 @@ const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/YOUR_EMAIL@example.com";
    REFERENCE DATA
    ========================================================================== */
 const COLUMNS    = ["Backlog", "In Progress", "Blocked", "Done"];
+// Internal status values never change; these are the roleplay labels shown to people.
+const COLUMN_LABELS = {
+  "Backlog": "Awaiting Orders",
+  "In Progress": "Underway",
+  "Blocked": "Adrift",
+  "Done": "Mission Complete"
+};
 const COLUMN_HINTS = {
-  "Backlog": "Logged, not yet scheduled",
-  "In Progress": "Actively being worked",
-  "Blocked": "Waiting on dependency, vendor or approval",
+  "Backlog": "Mission logged, not yet scheduled",
+  "In Progress": "Crew actively working",
+  "Blocked": "Waiting on a dependency, vendor or approval",
   "Done": "Completed or closed"
 };
+const PRIORITY_LABELS = { "Critical": "Red Alert", "High": "Yellow Alert", "Medium": "Standard", "Low": "Routine" };
+function columnLabel(status) { return COLUMN_LABELS[status] || status; }
+function priorityLabel(priority) { return PRIORITY_LABELS[priority] || priority; }
 const PROJECTS   = ["Core Banking Upgrade", "Digital Channels", "Cybersecurity Uplift",
                     "Data & Analytics", "Infrastructure & Cloud", "Vendor Management"];
 const CATEGORIES = ["Application Development", "Infrastructure", "Cybersecurity",
@@ -602,7 +617,7 @@ const state = {
   chat: []            // chatbot messages, in memory only
 };
 // Transient UI state (which card is asking "Delete?", where to restore focus)
-// sweep: true only until the first render, so the enso draws itself once
+// sweep: kept for compatibility; the header bars animate in CSS
 const ui = { confirmDeleteId: null, focus: null, lastOpener: null, sweep: true, chatOpen: false, muted: false, noticeOpen: false };
 let nextIdCounter = 1;
 
@@ -637,6 +652,17 @@ function nextTaskId() {
   return "UOB-ITPM-" + String(nextIdCounter++).padStart(4, "0");
 }
 function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
+
+// A stardate here is just year.dayOfYear (flavour only, not a real calendar).
+function stardate(d) {
+  const start = new Date(d.getFullYear(), 0, 0);
+  const day = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - start) / 864e5);
+  return d.getFullYear() + "." + String(day).padStart(3, "0");
+}
+function stardateFromISO(iso) {
+  const [y, m, dd] = iso.split("-").map(Number);
+  return stardate(new Date(y, m - 1, dd));
+}
 
 /* ==========================================================================
    SEED DATA — 8 demo tasks (dates relative to today so they stay realistic)
@@ -687,7 +713,7 @@ function renderCard(task) {
   const id = escapeHtml(task.id);
   const confirming = ui.confirmDeleteId === task.id;
   const moveOptions = COLUMNS.filter(c => c !== task.status)
-    .map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+    .map(c => `<option value="${escapeHtml(c)}">${escapeHtml(columnLabel(c))}</option>`).join("");
 
   const actions = confirming
     ? `<span class="confirm" role="group" aria-label="Confirm delete ${id}">
@@ -696,7 +722,7 @@ function renderCard(task) {
          <button type="button" data-action="delete-no" data-id="${id}">No</button>
        </span>`
     : `<button type="button" class="del-btn" data-action="delete-ask" data-id="${id}"
-         aria-label="Delete task ${id}">&times;</button>`;
+         aria-label="Delete mission ${id}">&times;</button>`;
 
   return `
   <li class="card p-${slug(task.priority)}" draggable="true" data-id="${id}">
@@ -704,19 +730,19 @@ function renderCard(task) {
       <span class="card-id">${id}</span>
       <span class="chips">
         ${overdue ? '<span class="overdue">Overdue</span>' : ""}
-        <span class="pill ${slug(task.priority)}">${escapeHtml(task.priority)}</span>
+        <span class="pill ${slug(task.priority)}">${escapeHtml(priorityLabel(task.priority))}</span>
       </span>
     </div>
     <h3>${escapeHtml(task.title)}</h3>
     ${task.description ? `<p class="desc">${escapeHtml(task.description)}</p>` : ""}
     <dl class="meta">
       <dt>Project</dt><dd>${escapeHtml(task.project)}</dd>
-      <dt>Assignee</dt><dd>${escapeHtml(task.assignee)}</dd>
-      <dt>Due</dt><dd>${escapeHtml(formatDate(task.dueDate))}</dd>
+      <dt>Officer</dt><dd>${escapeHtml(task.assignee)}</dd>
+      <dt>Due</dt><dd>${escapeHtml(formatDate(task.dueDate))} · SD ${escapeHtml(stardateFromISO(task.dueDate))}</dd>
     </dl>
     <div class="chips"><span class="tag">${escapeHtml(task.category)}</span></div>
     <div class="card-actions">
-      <select class="move-select" data-id="${id}" aria-label="Move task ${id} to another column">
+      <select class="move-select" data-id="${id}" aria-label="Move mission ${id} to another column">
         <option value="" selected disabled>Move ▸</option>${moveOptions}
       </select>
       ${actions}
@@ -727,31 +753,20 @@ function renderCard(task) {
 function renderSummary() {
   const total = state.tasks.length;
   const overdue = state.tasks.filter(isOverdue).length;
-  const items = [["tasks", total]]
-    .concat(COLUMNS.map(c => [c, state.tasks.filter(t => t.status === c).length]))
+  const items = [["missions", total]]
+    .concat(COLUMNS.map(c => [columnLabel(c), state.tasks.filter(t => t.status === c).length]))
     .concat([["Overdue", overdue]]);
+  document.getElementById("stardate").textContent = "Stardate " + stardate(new Date());
   document.getElementById("summary").innerHTML = items.map(([label, n]) =>
     `<li${label === "Overdue" && n > 0 ? ' class="is-overdue"' : ""}>
        <span class="num">${n}</span><span class="lbl">${escapeHtml(label)}</span></li>`).join("");
 }
 
-// The open enso: an incomplete brushed ring holding the real count as text.
-// The arc sweeps 40% to 92% of the circle by the column's share of visible
-// tasks, so it never closes. The first 20% of the arc is drawn thicker.
-function ensoMarkup(count, share, sweep) {
-  const frac = Math.min(0.92, Math.max(0.4, 0.4 + 0.52 * share));
-  const c = 18, r = 14, startDeg = -60, totalDeg = frac * 360;
-  const pt = deg => {
-    const a = deg * Math.PI / 180;
-    return (c + r * Math.cos(a)).toFixed(2) + " " + (c + r * Math.sin(a)).toFixed(2);
-  };
-  const arc = (from, to) =>
-    `M${pt(from)} A${r} ${r} 0 ${to - from > 180 ? 1 : 0} 1 ${pt(to)}`;
-  return `<svg class="enso${sweep ? " sweep" : ""}" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
-      <path class="arc" pathLength="1" d="${arc(startDeg, startDeg + totalDeg)}"/>
-      <path class="arc arc-start" pathLength="1" d="${arc(startDeg, startDeg + totalDeg * 0.2)}"/>
-      <text x="18" y="18">${count}</text>
-    </svg>`;
+// The count capsule: the real count as text, plus a thin meter showing the
+// column's share of the visible missions (decorative, so the text is the signal).
+function countCapMarkup(count, share) {
+  const pct = Math.round(Math.min(1, Math.max(0, share)) * 100);
+  return `<span class="cap"><span>${count}</span><span class="meter"><i style="width:${pct}%"></i></span></span>`;
 }
 
 function renderBoard() {
@@ -763,13 +778,13 @@ function renderBoard() {
     <section class="column" data-status="${escapeHtml(status)}" aria-labelledby="col-${slug(status)}">
       <div class="column-head">
         <div>
-          <h2 id="col-${slug(status)}">${escapeHtml(status)}</h2>
+          <h2 id="col-${slug(status)}">${escapeHtml(columnLabel(status))}</h2>
           <p class="sub">${escapeHtml(COLUMN_HINTS[status])}</p>
         </div>
-        <span class="badge" role="img" aria-label="${cards.length} ${cards.length === 1 ? "task" : "tasks"}">${ensoMarkup(cards.length, share, ui.sweep)}</span>
+        <span class="badge" role="img" aria-label="${cards.length} ${cards.length === 1 ? "mission" : "missions"}">${countCapMarkup(cards.length, share)}</span>
       </div>
       <ul class="dropzone">
-        ${cards.length ? cards.map(renderCard).join("") : '<li class="empty">Nothing here yet.</li>'}
+        ${cards.length ? cards.map(renderCard).join("") : '<li class="empty">No missions here yet.</li>'}
       </ul>
     </section>`;
   }).join("");
@@ -778,7 +793,7 @@ function renderBoard() {
   renderSummary();
   const note = document.getElementById("filter-note");
   if (visible.length === state.tasks.length) note.textContent = "";
-  else note.textContent = `Showing ${visible.length} of ${state.tasks.length} tasks.` +
+  else note.textContent = `Showing ${visible.length} of ${state.tasks.length} missions.` +
     (visible.length === 0 ? " Clear filters to see everything." : "");
 
   // Restore keyboard focus after a re-render (cards are rebuilt from state)
@@ -823,7 +838,7 @@ function deleteTask(id) {
   state.tasks = state.tasks.filter(t => t.id !== id);
   ui.confirmDeleteId = null;
   renderBoard();
-  showToast(`Deleted ${id}`);
+  showToast(`Mission ${id} scrubbed from the log`);
 }
 
 /* ==========================================================================
@@ -899,10 +914,10 @@ function setError(field, message) {
 function validateForm(data) {
   const errors = {};
   const title = data.title.trim();
-  if (!title) errors.title = "Enter a task title.";
+  if (!title) errors.title = "Enter a mission title.";
   else if (title.length > 80) errors.title = "Shorten the title to 80 characters or fewer.";
-  if (data.description.length > 500) errors.description = "Shorten the description to 500 characters or fewer.";
-  if (!data.assignee.trim()) errors.assignee = "Enter an assignee.";
+  if (data.description.length > 500) errors.description = "Shorten the brief to 500 characters or fewer.";
+  if (!data.assignee.trim()) errors.assignee = "Enter an officer.";
   if (!data.dueDate) errors.dueDate = "Choose a due date.";
   else if (data.dueDate < todayISO()) errors.dueDate = "Choose a due date that is today or later.";
 
@@ -915,7 +930,7 @@ function validateForm(data) {
 function setSending(sending) {
   const btn = document.getElementById("submit-btn");
   btn.disabled = sending;
-  btn.textContent = sending ? "Sending…" : "Add task";
+  btn.textContent = sending ? "Sending…" : "Log mission";
 }
 
 async function handleSubmit(event) {
@@ -926,13 +941,13 @@ async function handleSubmit(event) {
 
   // Optimistic UI: the card appears immediately; email goes out in parallel.
   const task = addTask(data);
-  showToast(`Added ${task.id} to ${task.status}`);
+  showToast(`Mission ${task.id} logged under ${columnLabel(task.status)}`);
   setSending(true);
   try {
     await notifyNewTask(task);
   } catch (err) {
     console.warn("Notification failed:", err);
-    showToast("Card added locally. Email notification failed.", "warn");
+    showToast("Mission logged locally. Subspace relay (email) failed.", "warn");
   } finally {
     setSending(false);
     resetForm();
@@ -1027,9 +1042,9 @@ function initDragAndDrop() {
    No external AI, no backend, no storage: messages live in state.chat.
    ========================================================================== */
 const GREETING_TEXT = "I am your IT assistant, how can I help you?";   // spoken on click
-const GREETING_SHOWN = "I am your IT assistant. How can I help you?";   // shown in the chat
-const CHAT_SUGGESTIONS = ["What is blocked?", "Show overdue tasks", "How do I reset my password?"];
-const FALLBACK_TEXT = "I could not find that. I can look up tasks on this board, for example \"What is blocked?\", or answer IT help questions about passwords, VPN, MFA, patching and vendor requests.";
+const GREETING_SHOWN = "Computer online. I am your IT assistant. How can I help you?";   // shown in the chat
+const CHAT_SUGGESTIONS = ["What is adrift?", "Show overdue missions", "How do I reset my password?"];
+const FALLBACK_TEXT = "Unable to comply. No matching record found. Ask about missions on this board, for example \"What is adrift?\", or about IT help: passwords, VPN, MFA, patching and vendor requests.";
 
 // Demo knowledge base (fictitious, for training only)
 const FAQ_DOCS = [
@@ -1045,7 +1060,7 @@ const FAQ_DOCS = [
 
 const STOP_WORDS = new Set(("a an the is are was were be been am do does did how what which who whom when where why i me my we our you your it its " +
   "of to in on at for from with about and or but if then so can could should would will shall please show tell give me list any there this that these those has have had").split(" "));
-const SYNONYMS = { stuck: "blocked", waiting: "blocked", late: "overdue", pastdue: "overdue",
+const SYNONYMS = { stuck: "blocked", waiting: "blocked", adrift: "blocked", becalmed: "blocked", underway: "progress", awaiting: "backlog", late: "overdue", pastdue: "overdue",
   finished: "done", complete: "done", completed: "done", owner: "assignee", lead: "assignee" };
 
 // Lowercase, drop punctuation and stop words, map synonyms, light stemming.
@@ -1069,12 +1084,12 @@ function buildCorpus() {
     const due = formatDate(t.dueDate);
     return {
       label: t.id,
-      line: `${t.title} (${t.status}, ${t.priority} priority, ${t.assignee}, due ${due}${overdue ? ", overdue" : ""})`,
-      tokens: tokenize(`task ${t.id} ${t.title} ${t.description} ${t.project} ${t.category} ${t.assignee} ` +
-                       `${t.priority} ${t.status} due ${due} ${overdue ? "overdue" : ""}`)
+      line: `${t.title} (${columnLabel(t.status)}, ${priorityLabel(t.priority)}, ${t.assignee}, due ${due}${overdue ? ", overdue" : ""})`,
+      tokens: tokenize(`mission task ${t.id} ${t.title} ${t.description} ${t.project} ${t.category} ${t.assignee} ` +
+                       `${t.priority} ${priorityLabel(t.priority)} ${t.status} ${columnLabel(t.status)} due ${due} ${overdue ? "overdue" : ""}`)
     };
   });
-  FAQ_DOCS.forEach(f => docs.push({ label: "FAQ: " + f.title, line: f.text, tokens: tokenize(f.title + " " + f.text) }));
+  FAQ_DOCS.forEach(f => docs.push({ label: "Library: " + f.title, line: f.text, tokens: tokenize(f.title + " " + f.text) }));
   return docs;
 }
 
@@ -1109,7 +1124,7 @@ function answer(query) {
   const hits = retrieve(query);
   if (!hits.length) return { text: FALLBACK_TEXT, sources: [] };
   return {
-    text: hits.length === 1 ? "Here is what I found." : `I found ${hits.length} matches.`,
+    text: hits.length === 1 ? "Record found." : `${hits.length} records found.`,
     sources: hits.map(h => ({ label: h.doc.label, line: h.doc.line }))
   };
 }
@@ -1277,19 +1292,19 @@ function initNotice() {
 /* ==========================================================================
    INIT — populate selects, wire events, first render
    ========================================================================== */
-function fillSelect(select, values, selected) {
+function fillSelect(select, values, selected, labelOf) {
   const keep = select.innerHTML; // keeps any leading "All …" option
   select.innerHTML = keep + values.map(v =>
-    `<option value="${escapeHtml(v)}"${v === selected ? " selected" : ""}>${escapeHtml(v)}</option>`).join("");
+    `<option value="${escapeHtml(v)}"${v === selected ? " selected" : ""}>${escapeHtml(labelOf ? labelOf(v) : v)}</option>`).join("");
 }
 
 function init() {
   fillSelect(document.getElementById("f-project"), PROJECTS);
-  fillSelect(document.getElementById("f-priority"), PRIORITIES);
+  fillSelect(document.getElementById("f-priority"), PRIORITIES, undefined, priorityLabel);
   fillSelect(document.getElementById("t-project"), PROJECTS);
   fillSelect(document.getElementById("t-category"), CATEGORIES);
-  fillSelect(document.getElementById("t-priority"), PRIORITIES, "Medium");
-  fillSelect(document.getElementById("t-status"), COLUMNS, "Backlog");
+  fillSelect(document.getElementById("t-priority"), PRIORITIES, "Medium", priorityLabel);
+  fillSelect(document.getElementById("t-status"), COLUMNS, "Backlog", columnLabel);
 
   state.tasks = seedTasks();
 

@@ -3,7 +3,7 @@
 [![CI](https://github.com/ramnaths2013/claude-training/actions/workflows/ci.yml/badge.svg)](https://github.com/ramnaths2013/claude-training/actions/workflows/ci.yml)
 [![Pages](https://github.com/ramnaths2013/claude-training/actions/workflows/pages.yml/badge.svg)](https://github.com/ramnaths2013/claude-training/actions/workflows/pages.yml)
 
-A single-page Kanban board for a fictitious bank's internal IT PMO. **Demo / training tool only.**
+A single-page, Star Trek themed Kanban board for a fictitious bank's internal IT PMO. **Demo / training tool only.**
 
 **Live demo:** https://ramnaths2013.github.io/claude-training/
 
@@ -25,4 +25,5 @@ Double-click `index.html`. No build step, server or install needed.
 - The only network call is the optional FormSubmit new-task notification; a failure never breaks the board
 
 ## Disclaimer
+The visual theme is an unofficial fan-style homage. It is not affiliated with or endorsed by the owners of Star Trek, and uses no official logos, insignia or fonts.
 The bank is fictitious. This project uses a neutral "IT PMO" wordmark and no real UOB logos or trademarks.

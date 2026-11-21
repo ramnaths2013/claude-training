@@ -3,6 +3,7 @@
 ## Project
 Single-page IT PMO Kanban board for a fictitious bank's internal IT PMO. Demo/training tool only.
 - Everything lives in one file: `index.html` (markup, `<style>`, `<script>`).
+- Theme: Star Trek style (full roleplay), an unofficial LCARS-inspired homage. Internal status and priority values stay `Backlog/In Progress/Blocked/Done` and `Critical/High/Medium/Low`; only the display labels change (`COLUMN_LABELS`, `PRIORITY_LABELS`). No official logos, insignia or fonts. Design tokens and the ratio table live in `.ulpi/design/DESIGN.md`.
 - Do not use real UOB logos, trademarks or imitations of official systems. Use the neutral "IT PMO" text wordmark and the corporate-blue palette. Task IDs keep the `UOB-ITPM-####` format.
 
 ## Hard constraints

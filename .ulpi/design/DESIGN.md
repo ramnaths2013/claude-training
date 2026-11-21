@@ -1,87 +1,68 @@
 ---
-project: IT PMO Board
+project: IT PMO Mission Board
 register: product
-aesthetic_direction: organic / natural (wabi-sabi)
-color_strategy: restrained
+aesthetic_direction: retro-futuristic (LCARS-inspired console, unofficial Star Trek homage)
+color_strategy: committed
 design_system: bespoke   # CLAUDE.md forbids frameworks and external resources; vanilla CSS custom properties only
 design_variance: 6
 motion_intensity: 2
 visual_density: 6
 ---
 
-# IT PMO Board: locked design language
+# IT PMO Mission Board: locked design language
 
 Every screen must read as the same product if placed side by side.
+This replaces the earlier wabi-sabi identity (still in git history, commit `72ce052`).
 
 ## Design Read
-Quiet, weathered and honest. A working board that feels like a well-used workshop table: calm ground, soft edges, one ink-blue voice. The bet is that restraint and slight imperfection read as trust for a banking PMO.
+A bridge console for a bank's IT team: dark, calm, rounded, with coloured bars doing the structural work. The bet is that a playful theme still reads as a serious tool when contrast, labels and behaviour stay plain.
 
-## Aesthetic direction and why it passes the tests
-Wabi-sabi, filed under "organic / natural". The user asked for it by name, so two normally banned tells are used on purpose and justified here:
-- **Light neutral ground.** The anti-slop list bans cream/sand/beige. The ground here is lime-plaster grey with a faint green cast (hue 113, chroma 0.009), clearly cooler than the `#F4F1EA` family, and tokens avoid the banned names (`--paper`, `--cream`, `--sand`, `--linen`).
-- **A serif display face.** Justified by the Japanese mincho tradition, not by "creative brief means serif". It is used only for the wordmark, column titles and card titles.
-
-Counterfactual test: a generic corporate kanban would be white cards on a blue header with a gradient. This is not that. Colour is almost absent, structure comes from space (ma), and the one memorable move is the ensō count (see Signature).
-
-## Wabi-sabi principles mapped to the UI
-| principle | what it means here |
-|---|---|
-| wabi (rustic simplicity) | no gradients, no shadows beyond one soft contact shadow, no glass |
-| sabi (patina) | a faint paper grain on the ground, slightly uneven card corners |
-| fukinsei (asymmetry) | card corner radii differ per corner (see Scales); header is left-weighted with generous empty right |
-| kanso (simplicity) | one accent, three text tones, no decorative icons |
-| ma (negative space) | gaps between columns are space, not boxes; columns have no border or fill |
-| shibui (understated) | priority and state are carried by text first, colour second |
+## Legal and IP stance
+Unofficial fan-style homage. Original shapes, colours and wording only. No logos, Starfleet delta or other insignia, screenshots or official fonts. Generic vocabulary (stardate, red alert, subspace). The page footer and README carry a not-affiliated disclaimer.
 
 ## Signature
-**The open ensō.** Each column's task count sits inside an incomplete brushed circle (an inline SVG arc, about 300 degrees, stroke slightly thicker at the start). The gap in the ring is deliberate, the Japanese ideal of an imperfect, unfinished circle. The ring sweeps a little further as the column holds a larger share of all tasks (minimum 40 percent, maximum 92 percent so it never closes). The same ensō, smaller and unfilled, is the filter "clear" mark. Nothing else on the page is decorative.
+The **column header bar**: a coloured bar with a large rounded left cap, the column title and hint in dark ink, and a dark capsule on the right holding the real count plus a thin meter of the column's share of visible missions. The meter is decorative; the number is the signal.
 
-## Inspiration
-No reference links were given. DNA is taken from general wabi-sabi craft: lime plaster, sumi ink, indigo dye (aizome), kintsugi restraint. Rejected: tatami grids, cherry blossoms, red suns, brush-script fonts and any "Japanese-themed" clip art, all of which read as costume.
-
-## Color (locked)
-Neutrals are tinted toward the plaster green-yellow hue. 60-30-10 by weight: 60 ground and surfaces, 30 ink text, 10 indigo accent plus semantic.
-
-| role | OKLCH | hex | use | contrast |
-|------|-------|-----|-----|----------|
-| ground (`--ground`) | oklch(0.92 0.009 113) | #E4E5DE | page background | base |
-| surface (`--surface`) | oklch(0.95 0.008 114) | #EEEFE9 | header band, filter bar, modal ground | base |
-| card (`--card`) | oklch(0.97 0.005 106) | #F6F6F2 | task cards, modal panel | base |
-| line (`--line`) | oklch(0.84 0.012 117) | #C9CBC2 | hairlines, input borders | decorative only |
-| text (`--sumi`) | oklch(0.27 0.010 261) | #23262B | body and titles | 11.97 on ground, 14.01 on card |
-| muted (`--muted`) | oklch(0.45 0.011 258) | #52565C | secondary text, labels | 5.82 on ground, 6.81 on card |
-| subtle (`--subtle`) | oklch(0.54 0.011 258) | #6A6E74 | counters, hints (never essential info) | 4.73 on card |
-| accent (`--ai`, exactly one) | oklch(0.40 0.073 254) | #2B4A6F | primary button, links, focus ring, Medium priority | 7.16 on ground, 8.38 on card; 8.38 for #F6F6F2 text on it |
-| danger (`--shu`) | oklch(0.50 0.152 29) | #A8362A | Critical, Overdue, delete confirm, errors | 6.01 on card, 5.13 on ground |
-| warning (`--kaki`) | oklch(0.48 0.096 70) | #7F5210 | High priority text | 6.22 on card |
-| warning edge (`--kaki-edge`) | oklch(0.63 0.126 70) | #B97A1E | High priority left edge only | 3.30 on card (UI edge, passes 3:1) |
-| success (`--matsu`) | oklch(0.46 0.064 154) | #3A6348 | Done column mark, success toast | 6.34 on card |
-| low (`--nezumi`) | oklch(0.59 0.010 258) | #7A7E84 | Low priority left edge | 3.77 on card |
-
-Indigo keeps the original "corporate blue only" brief intact. Colour is never the only signal: every priority has a text pill, Overdue has a text badge.
+## Color (locked, dark theme)
+Contrast ratios computed against the surface they sit on (WCAG 2.x). All text pairs pass AA.
+| role | hex | use | contrast |
+|---|---|---|---|
+| ground `--ground` | #090A12 | page | base |
+| panel `--panel` | #12142A | cards, dialogs | base |
+| panel-2 `--panel-2` | #1B1E3C | inputs, chips, bot messages | base |
+| line `--line` | #2A2E55 | hairlines (decorative) | 1.4 |
+| edge `--edge` | #6C70A8 | control borders | 3.48 on panel-2 |
+| text `--text` | #ECEAFF | body | 16.7 ground, 15.3 panel, 13.7 panel-2 |
+| muted `--muted` | #B0ADCF | secondary text | 9.1 ground, 8.4 panel, 7.5 panel-2 |
+| subtle `--subtle` | #8E8BB0 | counters, placeholders | 5.6 panel |
+| ink `--ink` | #0A0A14 | text on bars | 9.5 orange, 9.1 lavender, 8.4 periwinkle, 12.5 tan, 7.1 red |
+| orange `--orange` (the one action colour) | #FF9C42 | primary button, Adrift column | 8.7 on panel |
+| lavender / periwinkle / tan | #C9A0E8 / #8EA4FF / #E9C9A0 | other columns, labels | 8.4 / 7.7 / 11.5 on panel |
+| red / yellow / violet | #FF6B6B / #FFC93C / #A39BC4 | Red Alert, Yellow Alert, Routine, Overdue | 6.5 / 11.8 / 6.9 on panel |
+| mint `--mint` | #6FD6B8 | success toast edge | 10.3 on panel |
+Priority colour is never the only signal: every card shows the alert level as text.
 
 ## Type (locked)
-No web fonts (CLAUDE.md). All faces are local system stacks, so `system-ui` is deliberately never first.
-
-| role | family stack | use | notes |
-|------|--------------|-----|-------|
-| display (`--font-display`) | "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", "Iowan Old Style", "Palatino Linotype", Georgia, serif | wordmark, column titles, card titles, modal title | weight 500, tracking 0.02em, sentence case |
-| body (`--font-body`) | "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", "Avenir Next", "Segoe UI", sans-serif | everything else | 14px, line-height 1.55, measure under 70ch |
-| utility (`--font-mono`) | ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace | task IDs, counters | 12px, tracking 0.04em |
-
-Pairing axis: serif plus humanist sans, contrast in stroke and rhythm.
-Scale (px): 11 (labels, uppercase with 0.08em tracking), 12, 14 (body), 16 (card title), 20 (column title), 26 (wordmark). Nothing else.
+Local stacks only (no web fonts).
+| role | stack | use |
+|---|---|---|
+| display | "Avenir Next Condensed", "Arial Narrow", "Roboto Condensed", "Helvetica Neue", Arial, sans-serif | wordmark, column and dialog titles, labels, pills; uppercase with 0.1 to 0.24em tracking |
+| body | "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif | everything else, 14px, line-height 1.55 |
+| utility | ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace | task IDs, counts, stardate |
+Scale (px): 11, 12, 14, 15, 16, 20, 34.
 
 ## Scales (locked)
-- **spacing:** 4, 8, 12, 16, 24, 40, 64. Column gap is 40 on desktop (ma). Card inner padding 16.
-- **radius:** `--r-1: 2px`, `--r-2: 6px`, `--r-3: 10px`. Cards use an uneven pair, `2px 6px 3px 8px`, the only asymmetry on the page. Controls use 2px. Pills use 999px.
-- **elevation:** one value only, `0 1px 0 var(--line), 0 6px 14px -10px rgba(35,38,43,.35)`. No other shadows. Modal backdrop is flat `rgba(35,38,43,.45)`.
-- **texture:** one inline SVG `feTurbulence` grain at 4 percent opacity on `body` as a data URI. No image files.
-- **motion:** durations 120ms (hover, focus), 300ms (drop highlight, toast), 500ms (ensō sweep on load, once). Easing `cubic-bezier(.3,.7,.2,1)`. No bounce, no elastic. Everything honours `prefers-reduced-motion: reduce` by dropping to 0ms.
-- **icon family:** none. Text and Unicode only (`×`, `▸`, `+`). The ensō is the only drawn mark.
+- spacing 4, 8, 12, 16, 24, 40, 64
+- radius 4, 10, 28 (cap), 999 (pill); card radius `4px 16px 16px 4px`
+- no shadows; separation by borders and colour
+- motion 120 / 300 / 500ms, easing `cubic-bezier(.3,.7,.2,1)`, no bounce; header bars sweep in once on load; everything is disabled under `prefers-reduced-motion`
+- texture: sparse inline SVG star dots on the ground, no image file
+- icon family: none beyond the cute droid avatar (round dark head, periwinkle visor, blink) and a small circular-arrow mark on Clear filters
 
-## Voice
-Plain, calm, short. No exclamation marks, no buzzwords, no em-dashes in visible text. Action vocabulary stays consistent: Add task, Added; Move, Moved; Delete, Deleted. Empty column text: "Nothing here yet." Errors say what to fix: "Choose a due date that is today or later."
-
-## Addendum: IT assistant avatar
-The chatbot avatar is the one drawn mark besides the ensō. It is a round, soft face on an indigo disc, built only from the locked ink, card and indigo tokens, with a faint shu blush at 35 percent opacity. It blinks every five seconds (off under `prefers-reduced-motion`). No other icon family is introduced. The chat panel reuses the card surface, uneven card radius, the single elevation and the display, body and mono type roles.
+## Voice (full roleplay, plain underneath)
+Ship-log tone, short sentences, no em-dashes in visible copy. Internal values never change; labels do.
+| internal | shown as |
+|---|---|
+| Backlog / In Progress / Blocked / Done | Awaiting Orders / Underway / Adrift / Mission Complete |
+| Critical / High / Medium / Low | Red Alert / Yellow Alert / Standard / Routine |
+Other terms: mission (task), officer (assignee), alert level (priority), stardate (`YYYY.DDD`), Ship's computer (chatbot), Incoming transmission (meeting popup), subspace relay (email). Kept literally for clarity: "Delete? Yes / No", "Overdue", "Room 888", the spoken greeting "I am your IT assistant, how can I help you?".
